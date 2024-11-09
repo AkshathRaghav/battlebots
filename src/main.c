@@ -101,7 +101,9 @@ void initb() {
  * 
  */
 void init_systick() {
-  SysTick->LOAD = 374999;
+  // SysTick->LOAD = 374999; //scans it 16times per sec
+  // SysTick->LOAD= 93750-1; //should scan it 64 times per sec. Very responsive.
+  SysTick->LOAD= 187500-1; //should scan it 32 times per sec. Decently Responsive as well. Might be better since does not check systick interrupt as often as before. 
   SysTick->VAL = 0;
   SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
   SysTick->CTRL &=~ SysTick_CTRL_CLKSOURCE_Msk; //here we are setting the clksrc bit to 0 to get 6MHz.
