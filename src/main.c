@@ -137,49 +137,64 @@ void SysTick_Handler() {
     {
       if(GPIOC->IDR & 0x1)
       {
+        //# symbol. R4, C3
+        /*
+          This is where code for Confirm Place would go.
+        */
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
-        //# symbol. R4, C3
         GPIOB->BSRR = GPIO_BSRR_BS_10;
       }
       else if(GPIOC->IDR & 0x4)
       {
+        //6. R2, C3
+        /*
+          This is where code for Mv Right would go.
+        */
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
-        //6. R2, C3
         GPIOB->BSRR = GPIO_BSRR_BS_9;
       }
       
     }
     if(current_col == 2)
     {
+        //8 R3, C2
+        /*
+          This is where code for Mv Down would go.
+        */
       if(GPIOC->IDR &  0x2)
       {
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
-        //8 R3, C2
         GPIOB->BSRR = GPIO_BSRR_BS_9;
         GPIOB->BSRR = GPIO_BSRR_BS_10;
 
       }
       else if(GPIOC->IDR & 0x4)
       {
+        //5, R2, C2
+        /*
+          This is where code for Rotate would go.
+        */
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
-        //5, R2, C2
         GPIOB->BSRR = GPIO_BSRR_BS_8;
 
       }
       else if(GPIOC->IDR & 0x8)
       {
+        //2, R1, C2
+        /*
+          This is where code for Mv Up would go.
+        */
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
-        //2, R1, C2
         GPIOB->BSRR = GPIO_BSRR_BS_8;
         GPIOB->BSRR = GPIO_BSRR_BS_10;
       }
@@ -188,19 +203,25 @@ void SysTick_Handler() {
     {
       if(GPIOC->IDR & 0x4)
       {
+        //4, R2, C1
+        /*
+          This is where code for Mv Left would go.
+        */
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
-        //4, R2, C1
         GPIOB->BSRR = GPIO_BSRR_BS_8;
         GPIOB->BSRR = GPIO_BSRR_BS_9;
       }
       else if(GPIOC->IDR & 0x1)
       {
+        //* symbol. R4, C1
+        /*
+          This is where code for Start would go.
+        */
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
-        //* symbol. R4, C1
         GPIOB->BSRR = GPIO_BSRR_BS_8;
         GPIOB->BSRR = GPIO_BSRR_BS_9;
         GPIOB->BSRR = GPIO_BSRR_BS_10;
