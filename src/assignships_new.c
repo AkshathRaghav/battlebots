@@ -6,18 +6,7 @@
 void printGrid(int grid[SIZE][SIZE]);
 void addShip(int grid[SIZE][SIZE], int orientation, int x, int y, int currShipSize);
 
-void send_key(char input);
 
-void send_key(char input)
-{
-
-}
-
-void mv_right()
-{
-    x1++;
-    x2++;
-}
 int main(void){
     int done = 0;
     int orientation = 2; // initially vertical ship at 0,0 
@@ -102,6 +91,7 @@ check_rot
     // set x2_temp and y2_temp based on temporary orientation. some case stmt or somn.
     // check_bounds(x1, x2_temp, y1, y2_temp)
 
+
 //valid_check(move_type)
     //case(move_type)
     2 -> check_mv_up()
@@ -116,4 +106,79 @@ mv_right()
     //valid_check(right)
     if(validflag)-> x1++, x2++;
 */
+int x1, x2, y1, y2;
+int orientation;
+int valid_flag;
+
+void check_rot()
+{
+    int x2_temp, y2_temp;
+    int temp_orientation = (orientation == 4)? 1: orientation++;
+    switch(temp_orientation)
+    {
+        case(1): 
+                x2_temp = x1;
+                y2_temp = y1 + 1; 
+                break;  
+        case(2):
+                x2_temp = x1 + 1;
+                y2_temp = y1;
+                break;
+        case(3):
+                x2_temp = x1 ;
+                y2_temp = y1 - 1;
+                break;
+        case(4):
+                x2_temp = x1 - 1;
+                y2_temp = y1;
+                break;
+    }
+
+    check_bounds(x1, x2_temp, y1, y2_temp);
+    if(!valid_flag)
+    {
+        return;
+    }
+    check_overlap(temp_orientation, x2_temp, y2_temp);
+    return;
+}
+
+void check_mv_down()
+{
+    int y1_temp = y1 + 1;
+    int y2_temp = y2_temp + 1;
+    check_bounds(x1, x2, y1_temp, y2_temp);
+    if(!valid_flag)
+    {
+        return;
+    }
+    check_overlap(orientation, y1_temp, y2_temp);
+    return;
+}
+
+void check_mv_left()
+{
+    int x1_temp = x1 - 1;
+    int x2_temp = x2 - 1;
+    check_bounds(x1_temp, x2_temp, y1, y2);
+    if(!valid_flag)
+    {
+        return;
+    }
+    check_overlap(orientation, x1_temp, x2_temp);
+    return;
+}
+
+void check_mv_right()
+{
+    int x1_temp = x1 + 1;
+    int x2_temp = x2 + 1;
+    check_bounds(x1_temp, x2_temp, y1, y2);
+    if(!valid_flag)
+    {
+        return;
+    }
+    check_overlap(orientation, x1_temp, x2_temp);
+    return;
+}
 
