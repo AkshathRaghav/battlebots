@@ -20,7 +20,7 @@ const char* username = "bhide1";
 
 #include "stm32f0xx.h"
 #include <stdint.h>
-
+#include <assignships_new.c>
 void initc();
 void initb();
 void togglexn(GPIO_TypeDef *port, int n);
@@ -141,6 +141,7 @@ void SysTick_Handler() {
         /*
           This is where code for Confirm Place would go.
         */
+        confirm();
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
@@ -152,6 +153,7 @@ void SysTick_Handler() {
         /*
           This is where code for Mv Right would go.
         */
+        mv_right();
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
@@ -165,6 +167,7 @@ void SysTick_Handler() {
         /*
           This is where code for Mv Down would go.
         */
+       mv_down();
       if(GPIOC->IDR &  0x2)
       {
         GPIOB->BRR = GPIO_BRR_BR_10;
@@ -180,6 +183,7 @@ void SysTick_Handler() {
         /*
           This is where code for Rotate would go.
         */
+        mv_rot();
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
@@ -192,6 +196,7 @@ void SysTick_Handler() {
         /*
           This is where code for Mv Up would go.
         */
+        mv_up();
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
@@ -207,6 +212,7 @@ void SysTick_Handler() {
         /*
           This is where code for Mv Left would go.
         */
+        mv_left();
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
@@ -219,6 +225,7 @@ void SysTick_Handler() {
         /*
           This is where code for Start would go.
         */
+        start();
         GPIOB->BRR = GPIO_BRR_BR_10;
         GPIOB->BRR = GPIO_BRR_BR_9;
         GPIOB->BRR = GPIO_BRR_BR_8;
@@ -253,7 +260,6 @@ void set_col(int col) {
     GPIOC->ODR &=~ (GPIO_ODR_4 | GPIO_ODR_5| GPIO_ODR_6| GPIO_ODR_7) ;
 
     GPIOC->ODR |= (1<< (8-col));
-
 
 }
 
