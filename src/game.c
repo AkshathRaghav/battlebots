@@ -396,15 +396,15 @@ void check_mv_right()
     return;
 }
 
-void init_ship() {
-    orientation = 3;
-    y1 = 0;
-    y2 = ship_sizes[counter] - 1;
-    x1 = 0;
-    x2 = 0;
-    check_overlap(orientation, y1, y2);
-    // draw
-}
+// void init_ship() {
+//     orientation = 3;
+//     y1 = 0;
+//     y2 = ship_sizes[counter] - 1;
+//     x1 = 0;
+//     x2 = 0;
+//     check_overlap(orientation, y1, y2);
+//     // draw
+// }
 
 void confirm() {
     check_overlap(orientation, coord_array[counter][0], coord_array[counter][2]);
