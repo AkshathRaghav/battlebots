@@ -5,8 +5,7 @@
 #include "game.h"
 
 const char* team = "battlebots";
-volatile int current_col = 1;
-int state = -1; 
+volatile int current_col = 1; 
 
 void mv_right(); 
 void mv_left(); 
@@ -17,6 +16,17 @@ void start_up();
 
 // Routes logic to game
 void SysTick_Handler() {
+    if(counter >= sizeof(ship_sizes)/sizeof(ship_sizes[0])){ // done placing ships - move on 
+        state = 1; // after done with setting ships, bomb ships state starts
+    }
+    else{
+        if(init_flag){
+            init_ship();
+            LCD_DrawShip(x1, y1, x2, y2, (valid_flag ? COLOR_GREEN : COLOR_RED));
+            init_flag = 0;
+        }
+    }
+
     if(current_col == 3)
     {
       if(GPIOC_IDR & 0x1)
@@ -57,13 +67,20 @@ void SysTick_Handler() {
         mv_left();
       }
       else if(GPIOC->IDR & 0x1) { 
+        // *, Start Logic 
         if (state == -1) { 
             LCD_Clear(1111);
             LCD_DrawGrid(); 
             LCD_DrawCoords(); 
+            state = 0; // Starts to Game Logic 
+            
+            Game_Start(); 
+
             // Draw Ships
         } else { 
-            printf("Hold up!");
+            LCD_Clear(1111);
+            LCD_StartScreen(); 
+            state = -1; 
         }
       }
     }
@@ -75,8 +92,6 @@ void SysTick_Handler() {
     }
     set_col(current_col);
 }
-
-
 
 int main() {
     internal_clock();

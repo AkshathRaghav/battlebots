@@ -87,13 +87,10 @@ void get_dot_bbox(int i, int j, int *x1, int *y1, int *x2, int *y2) {
     *y2 = y + 5;
 }
 
-void set_dot() { 
-    int x, y, color;
-    x = 0; 
-    y = 0;
+void set_dot(int x, int y, Color color) { 
     int x1, y1, x2, y2; 
     get_dot_bbox(x, y, &x1, &y1, &x2, &y2);
-    LCD_DrawFillRectangle(x1, y1, x2, y2, COLOR_RED); 
+    LCD_DrawFillRectangle(x1, y1, x2, y2, color); 
 }
 
 void LCD_DrawCoords() {
@@ -108,13 +105,7 @@ void LCD_DrawCoords() {
     }
 }
 
-void draw_ship() {
-    int x1_idx, y1_idx, x2_idx, y2_idx; 
-    x1_idx = 0; 
-    y1_idx = 0; 
-    x2_idx = 0; 
-    y2_idx = 1; 
-
+void LCD_DrawShip(int x1_idx, int y1_idx, int x2_idx, int y2_idx, Color color) {
     int dot_count = 0;
     
     if (x1_idx == x2_idx) {
@@ -134,10 +125,10 @@ void draw_ship() {
     int y_bottom = (y1_end > y2_end) ? y1_end : y2_end;
 
     for (int i = 2; i <= 4; i++) {
-        LCD_DrawLine(x_left - i, y_top - i, x_left - i, y_bottom + i, 0x0000);   
-        LCD_DrawLine(x_right + i, y_top - i, x_right + i, y_bottom + i, 0x0000); 
-        LCD_DrawLine(x_left - i, y_top - i, x_right + i, y_top - i, 0x0000);     
-        LCD_DrawLine(x_left - i, y_bottom + i, x_right + i, y_bottom + i, 0x0000); 
+        LCD_DrawLine(x_left - i, y_top - i, x_left - i, y_bottom + i, color);   
+        LCD_DrawLine(x_right + i, y_top - i, x_right + i, y_bottom + i, color); 
+        LCD_DrawLine(x_left - i, y_top - i, x_right + i, y_top - i, color);     
+        LCD_DrawLine(x_left - i, y_bottom + i, x_right + i, y_bottom + i, color); 
     }
 }
 
@@ -271,6 +262,7 @@ void clear_f() {
     LCD_Clear(1111);
 }
 
+
 struct commands_t cmds[] = {
         { "lcd_init", lcd_init },
         { "clear",    clear },
@@ -282,7 +274,6 @@ struct commands_t cmds[] = {
         { "dots", LCD_DrawCoords },
         { "start", LCD_StartScreen },
         { "set", set_dot },
-        { "draw_ship", draw_ship }
 };
 
 // A weak definition that can be overridden by a better one.
@@ -331,6 +322,13 @@ void parse_command(char *c)
         exec(argc, argv);
     }
 }
+
+void dots_loc_color(int x, int y, Color c){
+    int x1, y1, x2, y2; 
+    get_dot_bbox(x, y, &x1, &y1, &x2, &y2);
+    LCD_DrawFillRectangle(x1, y1, x2, y2, c); 
+}
+
 
 static void insert_echo_string(const char *s)
 {

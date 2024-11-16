@@ -29,5 +29,7 @@ void LCD_Setup();
 void LCD_StartScreen(); 
 void LCD_DrawGrid(); 
 void LCD_DrawCoords(); 
+void LCD_DrawShip(int x1_idx, int y1_idx, int x2_idx, int y2_idx, Color color);
+void set_dot(int x, int y, Color color);
 
 #endif /* __COMMANDS_H_ */
