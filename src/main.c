@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <stdio.h>
-#include "setup.h"
-#include "commands.h"
-#include "game.h"
+#include <setup.h>
+#include <commands.h>
+#include <game.h>
 
 const char* team = "battlebots";
 volatile int current_col = 1; 
@@ -16,6 +16,8 @@ void start_up();
 
 // Routes logic to game
 void SysTick_Handler() {
+    // if(state == 0 || state == 1) then flash the grid
+    // if the value of grid is 0, there is nothing, 1 means there is a ship, 2 means there are 2 ships there
     if(counter >= sizeof(ship_sizes)/sizeof(ship_sizes[0])){ // done placing ships - move on 
         state = 1; // after done with setting ships, bomb ships state starts
     }
@@ -38,6 +40,7 @@ void SysTick_Handler() {
       {
         //6. R2, C3
         mv_right();
+        LCD_DrawShip(x1, y1, x2, y2, (valid_flag ? COLOR_GREEN : COLOR_RED));
       }
       
     }
@@ -113,3 +116,40 @@ int main() {
     LCD_StartScreen(); 
 }
 
+
+
+// we have a array which has 20 points. 4 * 5ships.
+//say we do mv_right:
+  // x1_new = x1 + 1 ; x2_new = x2++, y1_new = y1++; y2_new = y2++
+  //verify with new coords. 
+  //if can move
+    //array[counter]: x1_new, x2_new, y1_new, y2_new
+    //for the current ship we are controlling: LCD_Draw_Ship(array[counter]) : this would be current ship. For the other ships. Set_Dot(array[!counter]) * 4 times.
+
+    
+    //make it blank. Draw a white ship. at old_x1, old_x2, old_y1, old_y2
+
+  //LCD_iterate_array ()
+    //goes through the arrray of and plots the 5 ships (4points each).
+
+//for the current ship we are controlling: LCD_Draw_Ship(array[counter]) : this would be current ship. For the other ships. Set_Dot(array[!counter]) * 4 times.
+
+//array = [[x1, y1, x2, y2], [x1, y1, x2, y2], [x1, y1, x2, y2], [x1, y1, x2, y2], [x1, y1, x2, y2]]
+
+//counter goes from 0,1,2,3,4
+  //if counter is 0
+    // LCD_Draw_Ship(array[counter]) : with the corresponding valid_flag based color
+    //Set_Dot(array[counter + 1], white)
+     //Set_Dot(array[counter + 2], white)
+      //Set_Dot(array[counter + 3], white)
+
+  //if counter is 1
+    //Set_Dot(array[counter - 1], SAVED_COLOR = GREEN)
+    // LCD_Draw_Ship(array[counter]) : with the corresponding valid_flag based color
+     //Set_Dot(array[counter + 2], white)
+      //Set_Dot(array[counter + 3], white)
+
+    
+
+
+    

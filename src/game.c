@@ -57,7 +57,7 @@ void mv_down()
 
 void mv_left()
 {
-    check_mv_left;
+    check_mv_left();
     if(state == 0 && can_move)
     {
         //set_ship state
