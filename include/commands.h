@@ -25,7 +25,9 @@ struct commands_t {
 
 void command_shell(void);
 
-
-
+void LCD_Setup();
+void LCD_StartScreen(); 
+void LCD_DrawGrid(); 
+void LCD_DrawCoords(); 
 
 #endif /* __COMMANDS_H_ */

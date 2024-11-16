@@ -1,12 +1,40 @@
-#include "stm32f0xx.h"
-#include "fifo.h"
-#include "tty.h"
-#include "commands.h"
+#include "setup.h"
 
-#define FIFOSIZE 16
 char serfifo[FIFOSIZE]; 
 int seroffset = 0; 
 
+// Setup needed for SysTick
+void initc() {
+  RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+  GPIOC->MODER &= ~ (0x000000FF); 
+  GPIOC->PUPDR|= 0x000000AA;
+  GPIOC->MODER |= (0x00055500);
+}
+
+void initb() {
+  RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+  GPIOB->MODER &= ~ (0x000003F3);
+  GPIOB->PUPDR|= 0x000000A0;
+
+  GPIOB->MODER |= (0x00550000); 
+
+}
+
+// Keyboard Handling
+void set_col(int col) {
+    GPIOC->ODR &=~ (GPIO_ODR_4 | GPIO_ODR_5| GPIO_ODR_6| GPIO_ODR_7) ;
+    GPIOC->ODR |= (1<< (8-col));
+
+}
+
+void init_systick() {
+  SysTick->LOAD= 187500-1; 
+  SysTick->VAL = 0;
+  SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
+  SysTick->CTRL &=~ SysTick_CTRL_CLKSOURCE_Msk;
+}
+
+// Set up needed for USART
 void init_usart5() {
     RCC->AHBENR |= RCC_AHBENR_GPIOCEN; 
     RCC->AHBENR |= RCC_AHBENR_GPIODEN; 
@@ -36,6 +64,8 @@ void init_usart5() {
     while (!(USART5->ISR & USART_ISR_REACK));
 }
 
+
+// Setup needed for TTY Interfacing for Terminal 
 void enable_tty_interrupt(void) {
     RCC->AHBENR |= RCC_AHBENR_DMA2EN; 
     DMA2->CSELR |= DMA2_CSELR_CH2_USART5_RX; 
@@ -106,6 +136,7 @@ void USART3_8_IRQHandler(void) {
     }
 }
 
+// Setup needed for SPI - TFT Display communication
 void init_spi1_slow(void) {
     RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
     SPI2->CR1 &= ~SPI_CR1_SPE; 

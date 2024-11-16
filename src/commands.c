@@ -64,7 +64,7 @@ void drawfillrect(int argc, char *argv[])
     LCD_DrawFillRectangle(x1,y1,x2,y2,c);
 }
 
-void draw_grid() { 
+void LCD_DrawGrid() { 
     for (int i = 30; i <= 240; i += 30) { 
         LCD_DrawLine(i-1, 0, i-1, 320, 0000);
         LCD_DrawLine(i, 0, i, 320, 0000);
@@ -96,7 +96,7 @@ void set_dot() {
     LCD_DrawFillRectangle(x1, y1, x2, y2, COLOR_RED); 
 }
 
-void draw_dots() {
+void LCD_DrawCoords() {
     for (int x = 15; x <= 240; x += 30) {       
         for (int y = 20; y <= 320; y += 40) {   
             int x1 = x - 5;
@@ -204,7 +204,7 @@ void draw_star(x_center, y_center, color) {
     LCD_DrawLine(x_center - 10, y_center, x_center + 10, y_center, color);
 }
 
-void draw_start() {
+void LCD_StartScreen() {
     int x_start = 50;   // Starting x-coordinate
     int y_start = 60;   // Starting y-coordinate
     int letter_width = 20;
@@ -278,9 +278,9 @@ struct commands_t cmds[] = {
         { "drawline", drawline },
         { "drawrect", drawrect },
         { "drawfillrect", drawfillrect },
-        { "grid", draw_grid },
-        { "dots", draw_dots },
-        { "start", draw_start },
+        { "grid", LCD_DrawGrid },
+        { "dots", LCD_DrawCoords },
+        { "start", LCD_StartScreen },
         { "set", set_dot },
         { "draw_ship", draw_ship }
 };
