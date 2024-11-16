@@ -35,13 +35,13 @@ extern void internal_clock();
 extern void nano_wait(int); 
 
 int state = -1; // IDLE
-extern int [5]ship_sizes;
+
+extern int [5] ship_sizes;
 
 int main(void) {
     internal_clock();
     // Uncomment when most things are working
      //autotest();
-    state = -1; // IDLE State
     initb();
     initc();
     //init_exti();
@@ -272,5 +272,4 @@ void set_col(int col) {
     GPIOC->ODR &=~ (GPIO_ODR_4 | GPIO_ODR_5| GPIO_ODR_6| GPIO_ODR_7) ;
 
     GPIOC->ODR |= (1<< (8-col));
-
 }
