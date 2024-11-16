@@ -23,8 +23,8 @@ void SysTick_Handler() {
     }
     else{
         if(init_flag){
-            init_ship();
-            LCD_DrawShip(x1, y1, x2, y2, (valid_flag ? COLOR_GREEN : COLOR_RED));
+            check_overlap(orientation, coord_array[counter][1], coord_array[counter][3]);
+            LCD_DrawShip(coord_array[counter][0], coord_array[counter][1], coord_array[counter][2], coord_array[counter][3], (valid_flag ? COLOR_GREEN : COLOR_RED));
             init_flag = 0;
         }
     }
@@ -40,7 +40,6 @@ void SysTick_Handler() {
       {
         //6. R2, C3
         mv_right();
-        LCD_DrawShip(x1, y1, x2, y2, (valid_flag ? COLOR_GREEN : COLOR_RED));
       }
       
     }

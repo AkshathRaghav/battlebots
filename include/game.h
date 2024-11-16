@@ -22,12 +22,14 @@ int can_move;
 int x_bomb, y_bomb; //coordinates for the bomb.
 
 extern int valid_flag;
-extern int x1;
-extern int x2;
-extern int y1; 
-extern int y2;
+// extern int x1;
+// extern int x2;
+// extern int y1; 
+// extern int y2;
 extern int state; // extern because from other file. -1 is idle state, 0 is set_ship state. 1 is play_game state.
 extern int counter;
 extern int init_flag; 
+
+extern int coord_array[5][4];
 
 
