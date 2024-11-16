@@ -32,15 +32,16 @@ void adjust_priorities();
 
 extern void autotest();
 extern void internal_clock();
-extern void nano_wait(int);
+extern void nano_wait(int); 
 
 int state = -1; // IDLE
+extern int [5]ship_sizes;
 
 int main(void) {
     internal_clock();
     // Uncomment when most things are working
      //autotest();
-    
+    state = -1; // IDLE State
     initb();
     initc();
     //init_exti();
@@ -133,7 +134,17 @@ void SysTick_Handler() {
     //    particular column for next read of keypad.
 
     //If want to ignore when two buttons pressed together, GPIOC->IDR will have 2 1's. Therefore, if xor(GPIOC->IDR) is not 1. That means there are 2 1's.
-      //However, if three are pressed then it will pass thru. 
+  //However, if three are pressed then it will pass thru. 
+  if(counter >= sizeof(ship_sizes)/sizeof(ship_sizes[0])){ // done placing ships - move on 
+    state = 1; // after done with setting ships, bomb ships state starts
+  }
+  else{
+    if(init_flag){
+      init_ship();
+      init_flag = 0;
+    }
+  }
+
     if(current_col == 3)
     {
       if(GPIOC->IDR & 0x1)

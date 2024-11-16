@@ -20,7 +20,7 @@ int orientation;
 int ship_sizes [5] = {5, 4, 3, 3, 2};
 int valid_flag;
 int grid[SIZE][SIZE] = {0};
-int state = 0; //0 is set_ship state. 1 is play_game state.
+extern state; // extern because from other file. -1 is idle state, 0 is set_ship state. 1 is play_game state.
 int x_bomb, y_bomb; //coordinates for the bomb.
 int placed; // 0 if ship placed, 1 if ship isn't placed yet
 int counter = 0;
@@ -52,6 +52,7 @@ void mv_right()
         //play_game state. //now the mv_right is referring to moving the bomb_coordinate. 
         x_bomb++;
     }
+    valid_flag = 1;
 }
 
 void mv_left()
@@ -69,6 +70,7 @@ void mv_left()
         //play_game state 
         x_bomb--;
     }
+    valid_flag = 1;
 }
 
 void mv_up()
@@ -86,6 +88,7 @@ void mv_up()
         //play_game state 
         y_bomb--;
     }
+    valid_flag = 1;
 }
 
 void mv_down()
@@ -103,6 +106,7 @@ void mv_down()
         //play_game state 
         y_bomb++;
     }
+    valid_flag = 1;
 }
 
 void mv_rot()
@@ -132,6 +136,7 @@ void mv_rot()
                 y2 = y1;
                 break;
     }
+    valid_flag = 1;
 }
 
 void check_overlap(int temp_orientation, int temp_coord1, int temp_coord2){
@@ -174,9 +179,6 @@ void check_overlap(int temp_orientation, int temp_coord1, int temp_coord2){
 void check_bounds(int x1, int x2, int y1, int y2){
     if(y1 < 0 || y1 > (SIZE-1) || y2 < 0 || y2 > (SIZE-1) || x1 < 0 || x1 > (SIZE-1) || x2 < 0 || x2 > (SIZE-1)){
         valid_flag = 0;
-    }
-    else{
-        valid_flag = 1;
     }
 }
 
@@ -262,25 +264,27 @@ void check_mv_right()
     return;
 }
 
-void start()
-{
-    state = 0; // set_ship state
-    // readyup()
-
-    while(counter < sizeof(ship_sizes)/sizeof(ship_sizes[0])){
-        init_ship(); // set location of ship to 0,0
-        placed = 0;
-
-        if(placed){
-            counter++;
-        }
-    }
-}
-
 void init_ship()
 {
     orientation = 3;
     x1 = 0;
     x2 = ship_sizes[counter] - 1;
     check_overlap(orientation, x1, x2);
+}
+
+void confirm()
+{
+    check_overlap(orientation, x1, x2);
+    check_bounds(x1, x2, y1, y2);
+    if(valid_flag == 1){ // if it's valid, move on to the next ship, iterate the counter
+        counter++;
+        init_flag = 1; // ready to initialize position of next ship
+    }
+}
+
+void start()
+{
+    state = 0; // set ships state
+    counter = 0;
+    init_flag = 1;
 }
