@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <stdio.h>
-#include <setup.h>
-#include <commands.h>
-#include <game.h>
+#include "setup.h"
+#include "commands.h"
+#include "game.h"
 
 const char* team = "battlebots";
 volatile int current_col = 1; 

@@ -240,8 +240,8 @@ void LCD_StartScreen() {
     x_start = 120; 
     draw_star(x_start + 5, y_start + 2, 0);
     y_start += letter_height;
-    x_start = 5; 
-    x_start += letter_width + space + space;
+    x_start = 4; 
+    x_start += letter_width + space;
     draw_T(x_start, y_start, letter_height, letter_width, color); 
     x_start += letter_width + space;
     draw_O(x_start, y_start, letter_height, letter_width, color); 
