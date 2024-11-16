@@ -24,11 +24,11 @@ typedef union {
 // Current time in the FAT file system format.
 static fattime_t fattime;
 
-#define RED 0xFF0000
-#define BLUE 0x0000FF
-#define BACKGROUND 0xFFFFFF
-#define BLACK 0x000000
-#define GREEN 0x00FF00
+// #define RED 0xFF0000
+// #define BLUE 0x0000FF
+// #define BACKGROUND 0xFFFFFF
+// #define BLACK 0x000000
+// #define GREEN 0x00FF00
 
 void set_fattime(int year, int month, int day, int hour, int minute, int second)
 {
@@ -536,6 +536,17 @@ void set_dot() {
     LCD_DrawFillRectangle(x1, y1, x2, y2, 1445); 
 }
 
+void set_dot_loc(int argc, char* argv[]) { 
+    int x, y, color;
+    x = atoi(argv[1]);
+    y = atoi(argv[2]);
+
+    color = RED;   
+    int x1, y1, x2, y2; 
+    get_dot_bbox(x, y, &x1, &y1, &x2, &y2);
+    LCD_DrawFillRectangle(x1, y1, x2, y2, 1445); 
+}
+
 void draw_dots() {
     for (int x = 15; x <= 240; x += 30) {       
         for (int y = 20; y <= 320; y += 40) {   
@@ -555,6 +566,39 @@ void draw_ship() {
     x2_idx = 0; 
     y2_idx = 1; 
 
+    int dot_count = 0;
+    
+    if (x1_idx == x2_idx) {
+        dot_count = abs(y2_idx - y1_idx) + 1;
+    } else if (y1_idx == y2_idx) { 
+        dot_count = abs(x2_idx - x1_idx) + 1;
+    }
+    
+    int x1_start, y1_start, x1_end, y1_end;
+    int x2_start, y2_start, x2_end, y2_end;
+    get_dot_bbox(y1_idx, x1_idx, &x1_start, &y1_start, &x1_end, &y1_end);
+    get_dot_bbox(y2_idx, x2_idx, &x2_start, &y2_start, &x2_end, &y2_end);
+
+    int x_left = (x1_start < x2_start) ? x1_start : x2_start;
+    int x_right = (x1_end > x2_end) ? x1_end : x2_end;
+    int y_top = (y1_start < y2_start) ? y1_start : y2_start;
+    int y_bottom = (y1_end > y2_end) ? y1_end : y2_end;
+
+    for (int i = 2; i <= 4; i++) {
+        LCD_DrawLine(x_left - i, y_top - i, x_left - i, y_bottom + i, 0x0000);   
+        LCD_DrawLine(x_right + i, y_top - i, x_right + i, y_bottom + i, 0x0000); 
+        LCD_DrawLine(x_left - i, y_top - i, x_right + i, y_top - i, 0x0000);     
+        LCD_DrawLine(x_left - i, y_bottom + i, x_right + i, y_bottom + i, 0x0000); 
+    }
+}
+
+void ship_loc(int argc, char *argv[]) { 
+    int x1_idx, y1_idx, x2_idx, y2_idx; 
+    x1_idx = atoi(argv[1]); 
+    y1_idx = atoi(argv[2]); 
+    x2_idx = atoi(argv[3]); 
+    y2_idx = atoi(argv[4]);
+     
     int dot_count = 0;
     
     if (x1_idx == x2_idx) {
@@ -714,6 +758,7 @@ void clear_f() {
 
 
 struct commands_t cmds[] = {
+        {"dots_loc", set_dot_loc},
         { "append", append },
         { "cat", cat },
         { "cd", cd },
@@ -736,7 +781,8 @@ struct commands_t cmds[] = {
         { "dots", draw_dots },
         { "start", draw_start },
         { "set", set_dot },
-        { "draw_ship", draw_ship }
+        { "draw_ship", draw_ship },
+        { "ship_loc", ship_loc}
 };
 
 // A weak definition that can be overridden by a better one.
@@ -793,6 +839,18 @@ static void insert_echo_string(const char *s)
         insert_echo_char(*s++);
 }
 
+void dots_loc_color(int x, int y, Color c){
+    int x1, y1, x2, y2; 
+    get_dot_bbox(x, y, &x1, &y1, &x2, &y2);
+    LCD_DrawFillRectangle(x1, y1, x2, y2, c); 
+}
+
+void fill_grid(Color c){
+    for(int i = 0; i < 8; i ++)
+        for(int j = 0; j < 8; j ++)
+            dots_loc_color(i, j, c);
+}
+
 void command_shell(void)
 {
     // printf("\nEnter current "); fflush(stdout);
@@ -812,11 +870,7 @@ void command_shell(void)
     parse_command("start");
 
     fgets(line, 99, stdin);
-    // parse_command(line);
-
-    parse_command("clear_f");
-    parse_command("grid");
-    parse_command("dots");
+    parse_command(line);
 
     for(;;) {
         printf("> ");
