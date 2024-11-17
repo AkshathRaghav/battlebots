@@ -5,6 +5,10 @@
         "stdio.h": "c",
         "setup.h": "c",
         "game.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "main.h": "c",
+        "intercomm.h": "c",
+        "string.h": "c",
+        "lcd.h": "c"
     }
 }

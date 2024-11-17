@@ -1,12 +1,14 @@
 
 #include "stm32f0xx.h"
-#include "ff.h"
 #include "lcd.h"
-#include "tty.h"
 #include "commands.h"
 #include <string.h>
 #include <stdio.h>
 
+
+int len(int ship_sizes[]) {
+    return sizeof(ship_sizes) / sizeof(ship_sizes[0]);
+}
 
 void lcd_init(int argc, char *argv[])
 {
@@ -322,13 +324,6 @@ void parse_command(char *c)
         exec(argc, argv);
     }
 }
-
-void dots_loc_color(int x, int y, Color c){
-    int x1, y1, x2, y2; 
-    get_dot_bbox(x, y, &x1, &y1, &x2, &y2);
-    LCD_DrawFillRectangle(x1, y1, x2, y2, c); 
-}
-
 
 static void insert_echo_string(const char *s)
 {

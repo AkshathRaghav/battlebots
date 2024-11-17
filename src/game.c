@@ -1,15 +1,11 @@
 #include "game.h"
     
-int init_flag = 0; // 1 if place ship in top left, 0 if not initializing position of ship
+int init_flag = 0; // Ship Placement Toggle 
 int counter = 0;
 int state = -1; 
 int grid[SIZE][SIZE] = {0};
 int ship_sizes[5] = {5, 4, 3, 3, 2};
 int orientation = 3;
-// int x1 = 0; 
-// int x2 = 0; 
-// int y1 = 0; 
-// int y2 = 0; 
 int valid_flag = 1;
 
 int coord_array[5][4] = {
@@ -20,8 +16,7 @@ int coord_array[5][4] = {
         {0, 0, 0, 1}
     };
 
-void print_coord_array()
-{
+void print_coord_array() {
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 4; j++) {
             printf("%d ", coord_array[i][j]);
@@ -39,18 +34,25 @@ void printGrid(int grid[SIZE][SIZE]){
     }
 }
 
-void Update_Grid()
+void DrawShip(Color color) { 
+    LCD_DrawShip(
+        coord_array[counter][0],
+        coord_array[counter][1],
+        coord_array[counter][2],
+        coord_array[counter][3],
+        color
+    );
+}
+
+void LCD_UpdateGrid()
 {
-    //BASED ON COUNTER. SETS SHIP TO EITHER DOT (GREEN) TO SHOW PLACED. Draws the ships currently, being
+    // GREEN Dots -> Placed (Confirmed) Ships
+    // (Green/Red) Boundary around dots -> Unplaced (To-be-confirmed) ship 
+
     switch (counter)
     {
         case 0:
-            LCD_DrawShip(  coord_array[counter][0],
-                            coord_array[counter][1],
-                            coord_array[counter][2],
-                            coord_array[counter][3],
-                            (valid_flag ? COLOR_GREEN : COLOR_RED));
-
+            DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED));
             set_dot(coord_array[counter + 1][0],coord_array[counter + 1][1], COLOR_WHITE);
             set_dot(coord_array[counter + 2][0],coord_array[counter + 2][1], COLOR_WHITE);
             set_dot(coord_array[counter + 3][0],coord_array[counter + 3][1], COLOR_WHITE);
@@ -58,11 +60,7 @@ void Update_Grid()
             break;
         case 1:
             set_dot(coord_array[counter - 1][0],coord_array[counter - 1][1], COLOR_GREEN);
-            LCD_DrawShip(  coord_array[counter][0],
-                            coord_array[counter][1],
-                            coord_array[counter][2],
-                            coord_array[counter][3],
-                            (valid_flag ? COLOR_GREEN : COLOR_RED));
+            DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED));
             set_dot(coord_array[counter + 1][0],coord_array[counter + 1][1], COLOR_WHITE);
             set_dot(coord_array[counter + 2][0],coord_array[counter + 2][1], COLOR_WHITE);
             set_dot(coord_array[counter + 3][0],coord_array[counter + 3][1], COLOR_WHITE);
@@ -70,11 +68,7 @@ void Update_Grid()
         case 2:
             set_dot(coord_array[counter - 2][0],coord_array[counter - 2][1], COLOR_GREEN);
             set_dot(coord_array[counter - 1][0],coord_array[counter - 1][1], COLOR_GREEN);
-            LCD_DrawShip(  coord_array[counter][0],
-                            coord_array[counter][1],
-                            coord_array[counter][2],
-                            coord_array[counter][3],
-                            (valid_flag ? COLOR_GREEN : COLOR_RED));
+            DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED));
             set_dot(coord_array[counter + 1][0],coord_array[counter + 1][1], COLOR_WHITE);
             set_dot(coord_array[counter + 2][0],coord_array[counter + 2][1], COLOR_WHITE);
             break;
@@ -82,11 +76,7 @@ void Update_Grid()
             set_dot(coord_array[counter - 3][0],coord_array[counter - 3][1], COLOR_GREEN);
             set_dot(coord_array[counter - 2][0],coord_array[counter - 2][1], COLOR_GREEN);
             set_dot(coord_array[counter - 1][0],coord_array[counter - 1][1], COLOR_GREEN);
-            LCD_DrawShip(  coord_array[counter][0],
-                            coord_array[counter][1],
-                            coord_array[counter][2],
-                            coord_array[counter][3],
-                            (valid_flag ? COLOR_GREEN : COLOR_RED));
+            DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED));
             set_dot(coord_array[counter + 1][0],coord_array[counter + 1][1], COLOR_WHITE);
             break;
         case 4:
@@ -94,14 +84,9 @@ void Update_Grid()
             set_dot(coord_array[counter - 3][0],coord_array[counter - 3][1], COLOR_GREEN);
             set_dot(coord_array[counter - 2][0],coord_array[counter - 2][1], COLOR_GREEN);
             set_dot(coord_array[counter - 1][0],coord_array[counter - 1][1], COLOR_GREEN);
-            LCD_DrawShip(  coord_array[counter][0],
-                            coord_array[counter][1],
-                            coord_array[counter][2],
-                            coord_array[counter][3],
-                            (valid_flag ? COLOR_GREEN : COLOR_RED));
+            DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED)); 
             break;
-        default:
-            break;
+        default: break;
     }
 }
 
@@ -110,17 +95,9 @@ void mv_up()
     check_mv_up();
     if(state == 0 && can_move)
     {
-        LCD_DrawShip(  coord_array[counter][0],
-        coord_array[counter][1],
-        coord_array[counter][2],
-        coord_array[counter][3],
-        COLOR_WHITE);
-        //set_ship state
-        // y1--;
-        // y2--;
-        coord_array[counter][1] = coord_array[counter][1] - 1;
-        coord_array[counter][3] = coord_array[counter][3] - 1;
-        //need to update the ship drawn.
+        DrawShip(COLOR_WHITE); // Clears old boundary
+        coord_array[counter][1] = coord_array[counter][1] - 1;  // y1 = y1 - 1; 
+        coord_array[counter][3] = coord_array[counter][3] - 1;  // y2 = y2 - 1
         Update_Grid();  
     }
     else if(state == 1 && can_move)
@@ -136,17 +113,9 @@ void mv_down()
     check_mv_down();
     if(state == 0 && can_move)
     {
-        LCD_DrawShip(  coord_array[counter][0],
-        coord_array[counter][1],
-        coord_array[counter][2],
-        coord_array[counter][3],
-        COLOR_WHITE);
-        //set_ship state
-        // y1++;
-        // y2++;
-        coord_array[counter][1] = coord_array[counter][1] + 1;
-        coord_array[counter][3] = coord_array[counter][3] + 1;
-                //need to update the ship drawn.
+        DrawShip(COLOR_WHITE); // Clears old boundary
+        coord_array[counter][1] = coord_array[counter][1] + 1; // y1 = y1 + 1
+        coord_array[counter][3] = coord_array[counter][3] + 1; // y2 = y2 + 1
         Update_Grid();
         
     }
@@ -163,12 +132,8 @@ void mv_left()
     check_mv_left();
     if(state == 0 && can_move)
     {
-        LCD_DrawShip(  coord_array[counter][0],
-        coord_array[counter][1],
-        coord_array[counter][2],
-        coord_array[counter][3],
-        COLOR_WHITE);
-        //update the array based on new x1, x2 coords. //x1 -- , x2--
+        DrawShip(COLOR_WHITE);
+        // update the array based on new x1, x2 coords. //x1 -- , x2--
         coord_array[counter][0] = coord_array[counter][0] - 1;
         coord_array[counter][2] = coord_array[counter][2] - 1;
 
@@ -189,25 +154,15 @@ void mv_right()
     check_mv_right();
     if(state == 0 && can_move)
     {
-        //set_ship state: mv_right refers to moving the ship rightwards.
-        //make the ship's old position white.
-        LCD_DrawShip(  coord_array[counter][0],
-                coord_array[counter][1],
-                coord_array[counter][2],
-                coord_array[counter][3],
-                COLOR_WHITE);
-        //update the array based on new x1, x2 coords. x1 ++, x2 ++
-        coord_array[counter][0] = coord_array[counter][0] + 1;
-        coord_array[counter][2] = coord_array[counter][2] + 1;
-
-        //need to update the ship drawn.
+        DrawShip(COLOR_WHITE);
+        coord_array[counter][0] = coord_array[counter][0] + 1; // x1 = x1 + 1
+        coord_array[counter][2] = coord_array[counter][2] + 1; //x2 = x2 + 1
         Update_Grid();
 
     }
     else if(state == 1 && can_move)
     {
-        //play_game state. //now the mv_right is referring to moving the bomb_coordinate. 
-        //MIGHT HAVE TO CHECK OUT OF BOUNDS FOR BOMBING.
+        //play_game state.
         x_bomb++;
     }
     // valid_flag = 1;
@@ -216,31 +171,22 @@ void mv_right()
 void mv_rot()
 {
     check_mv_rot();
-    //orientation is changed to new_orientation.
-    if(state == 0 && can_move){
-        //make the old ship white.
-        LCD_DrawShip(  coord_array[counter][0],
-                coord_array[counter][1],
-                coord_array[counter][2],
-                coord_array[counter][3],
-                COLOR_WHITE);
-        // orientation = (orientation == 4)? 1: orientation++;
-        if(orientation == 4)
-        {
-            orientation = 1;
-        }
-        else
-        {
-            orientation++;
-        }
 
-        //based on new_orientation, need to change the x2, y2 coordinates. since x1, y1 are the pivot points
-        //for the rotation.
+    // Orientation is changed to new_orientation.
+    if (state == 0 && can_move) {
+        DrawShip(COLOR_WHITE);
+
+        // orientation = (orientation == 4) ? 1 : orientation++;
+        if(orientation == 4) orientation = 1;
+        else orientation++;
+
+        // Based on new_orientation, need to change the x2, y2 coordinates. since x1, y1 are the pivot points
+        // for the rotation.
         switch(orientation)
         {
             case(1): 
                     coord_array[counter][2] = coord_array[counter][0]; //x2 update
-                    coord_array[counter][3] = coord_array[counter][1] - 1;  //y2 update
+                    coord_array[counter][3] = coord_array[counter][1] - 1; // y2 update
                     break;  
             case(2):
                     coord_array[counter][2] = coord_array[counter][0] + 1;
@@ -257,11 +203,11 @@ void mv_rot()
         }
         Update_Grid();
     }
-    //if cannot move. then should be stuck in the same?
+    // TODO: if cannot move. then should be stuck in the same?
 }
 
 void check_overlap(int temp_orientation, int temp_coord1, int temp_coord2){
-    switch(temp_orientation){
+    switch (temp_orientation) {
         case 1:
             for(int i = temp_coord1; i >= temp_coord2; i--){
                 if(grid[i][coord_array[counter][0]] == 1){
@@ -311,6 +257,7 @@ void check_mv_rot()
     int x2_temp, y2_temp;
     int temp_orientation = (orientation == 4)? 1: orientation++;
     can_move = 1;
+    
     switch(temp_orientation)
     {
         case(1): 
@@ -330,13 +277,12 @@ void check_mv_rot()
                 y2_temp = coord_array[counter][1];
                 break;
     }
+    
     check_bounds(coord_array[counter][0], x2_temp, coord_array[counter][1], y2_temp);
-    if(!valid_flag)
-    {   
-        can_move = 0;
-        return;
-    }
-    check_overlap(temp_orientation, x2_temp, y2_temp);
+
+    if (!valid_flag) can_move = 0;
+    else check_overlap(temp_orientation, x2_temp, y2_temp);
+    
     return;
 }
 
@@ -357,13 +303,12 @@ void check_mv_down()
     int y1_temp = coord_array[counter][1] + 1;
     int y2_temp = coord_array[counter][3] + 1;
     can_move = 1;
+
     check_bounds(coord_array[counter][0], coord_array[counter][2], y1_temp, y2_temp);
-    if(!valid_flag)
-    {
-        can_move = 0;
-        return;
-    }
-    check_overlap(orientation, y1_temp, y2_temp);
+
+    if(!valid_flag) can_move = 0;
+    else check_overlap(orientation, y1_temp, y2_temp);
+
     return;
 }
 
@@ -371,14 +316,14 @@ void check_mv_left()
 {
     int x1_temp = coord_array[counter][0] - 1;
     int x2_temp = coord_array[counter][2] - 1;
+
     can_move = 1;
+
     check_bounds(x1_temp, x2_temp, coord_array[counter][1], coord_array[counter][3]);
-    if(!valid_flag)
-    {
-        can_move = 0;
-        return;
-    }
-    check_overlap(orientation, x1_temp, x2_temp);
+
+    if(!valid_flag) can_move = 0;
+    else check_overlap(orientation, x1_temp, x2_temp);
+
     return;
 }
 
@@ -397,26 +342,17 @@ void check_mv_right()
     return;
 }
 
-// void init_ship() {
-//     orientation = 3;
-//     y1 = 0;
-//     y2 = ship_sizes[counter] - 1;
-//     x1 = 0;
-//     x2 = 0;
-//     check_overlap(orientation, y1, y2);
-//     // draw
-// }
-
 void confirm() {
     check_overlap(orientation, coord_array[counter][0], coord_array[counter][2]);
     check_bounds(coord_array[counter][0], coord_array[counter][1],coord_array[counter][2], coord_array[counter][3]);
-    if(valid_flag == 1){ // if it's valid, move on to the next ship, iterate the counter
+    if (valid_flag) { 
+        // Increment counter, toggle init_flag for main.c#SysTickHandler()
         counter++;
-        init_flag = 1; // ready to initialize position of next ship
+        init_flag = 1; 
     }
 }
 
-void Game_Start() {
+void Game_Start_Ships() {
     counter = 0;
     init_flag = 1;
 }

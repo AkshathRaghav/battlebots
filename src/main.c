@@ -1,51 +1,21 @@
-#include <stdint.h>
-#include <stdio.h>
-#include "setup.h"
-#include "commands.h"
-#include "game.h"
+#include "main.h"
 
 const char* team = "battlebots";
 volatile int current_col = 1; 
 
-void mv_right(); 
-void mv_left(); 
-void mv_rot(); 
-void mv_up(); 
-void mv_down(); 
-void start_up();
-
-void send_data(int8_t msg){
-  //Waiting until the Tx data registor is not empty 
-  while (!(USART1->ISR & USART_ISR_TXE)){};
-  
-  USART1->TDR  = msg;
-
-  for(int i =0 ; i < 1000000; i ++); 
-  GPIOC->ODR &= ~(GPIO_ODR_9); 
-}
-
-int8_t read_data(){
-  //Waiting until the usart data registor is not empty 
-  while(!(USART1->ISR & USART_ISR_RXNE)){};
-
-  
-
-  int x = USART1->RDR; 
-  return x; 
-}
-
-// Routes logic to game
+// Interrupt handler 
+// Main router interface on every interrupt-call
 void SysTick_Handler() {
-    // if(state == 0 || state == 1) then flash the grid
-    // if the value of grid is 0, there is nothing, 1 means there is a ship, 2 means there are 2 ships there
+    // `state` tracks the part of the game logic we're in. 
+    // coord_array stores the start and end of each ship. Used in SET_SHIPS mode. 
 
-    if(counter >= sizeof(ship_sizes)/sizeof(ship_sizes[0])){ // done placing ships - move on 
-        state = 1; // after done with setting ships, bomb ships state starts
+    if (counter >= len(ship_sizes)){
+        state = BOMB_SHIPS; 
     }
     else{
         if(init_flag){
             check_overlap(orientation, coord_array[counter][1], coord_array[counter][3]);
-            LCD_DrawShip(coord_array[counter][0], coord_array[counter][1], coord_array[counter][2], coord_array[counter][3], (valid_flag ? COLOR_GREEN : COLOR_RED));
+            DrawShip(valid_flag ? COLOR_GREEN : COLOR_RED);
             init_flag = 0;
         }
     }
@@ -91,30 +61,22 @@ void SysTick_Handler() {
       }
       else if(GPIOC->IDR & 0x1) { 
         // *, Start Logic 
-        if (state == -1) { 
-            //LCD_Clear(1111);
+        if (state == LOADING_SCREEN) { 
             LCD_Clear(COLOR_WHITE);
             LCD_DrawGrid(); 
             LCD_DrawCoords(); 
-            state = 0; // Starts to Game Logic 
-            
-            Game_Start(); 
-
-            // Draw Ships
+            state = SET_SHIPS; 
+            Game_Start_Ships(); 
         } else { 
-            // LCD_Clear(1111);
             LCD_Clear(COLOR_WHITE);
             LCD_StartScreen(); 
-            state = -1; 
+            state = LOADING_SCREEN; 
         }
       }
     }
 
     current_col++;
-    if(current_col > 4)
-    {
-      current_col = 1;
-    }
+    if (current_col > 4) current_col = 1; 
     set_col(current_col);
 }
 

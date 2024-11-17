@@ -1,6 +1,4 @@
 #include "stm32f0xx.h"
-#include "fifo.h"
-#include "tty.h"
 #include "commands.h"
 
 #define GPIOC_IDR GPIOC->IDR
