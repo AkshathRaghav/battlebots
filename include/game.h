@@ -4,6 +4,8 @@
 
 #define SIZE 8
 
+
+
 void printGrid(int grid[SIZE][SIZE]);
 void check_mv_up();
 void check_mv_down();
@@ -13,6 +15,8 @@ void check_mv_rot();
 void check_overlap(int temp_orientation, int temp_coord1, int temp_coord2);
 void check_bounds(int x1, int x2, int y1, int y2);
 void Game_Start(); 
+
+void confirm();
 
 // Global Variables which will be there in the code. 
 int orientation;

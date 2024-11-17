@@ -34,7 +34,7 @@ void SysTick_Handler() {
       if(GPIOC_IDR & 0x1)
       {
         // # symbol. R4, C3
-
+        confirm();
       }
       else if(GPIOC_IDR & 0x4)
       {
@@ -71,7 +71,8 @@ void SysTick_Handler() {
       else if(GPIOC->IDR & 0x1) { 
         // *, Start Logic 
         if (state == -1) { 
-            LCD_Clear(1111);
+            //LCD_Clear(1111);
+            LCD_Clear(COLOR_WHITE);
             LCD_DrawGrid(); 
             LCD_DrawCoords(); 
             state = 0; // Starts to Game Logic 
@@ -80,7 +81,8 @@ void SysTick_Handler() {
 
             // Draw Ships
         } else { 
-            LCD_Clear(1111);
+            // LCD_Clear(1111);
+            LCD_Clear(COLOR_WHITE);
             LCD_StartScreen(); 
             state = -1; 
         }

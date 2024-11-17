@@ -5,18 +5,19 @@ int counter = 0;
 int state = -1; 
 int grid[SIZE][SIZE] = {0};
 int ship_sizes[5] = {5, 4, 3, 3, 2};
-int x1 = 0; 
-int x2 = 0; 
-int y1 = 0; 
-int y2 = 0; 
+int orientation = 3;
+// int x1 = 0; 
+// int x2 = 0; 
+// int y1 = 0; 
+// int y2 = 0; 
 int valid_flag = 1;
 
 int coord_array[5][4] = {
-        {0, 0, 0, 5},
         {0, 0, 0, 4},
         {0, 0, 0, 3},
-        {0, 0, 0, 3},
-        {0, 0, 0, 2}
+        {0, 0, 0, 2},
+        {0, 0, 0, 2},
+        {0, 0, 0, 1}
     };
 
 void print_coord_array()
@@ -44,64 +45,59 @@ void Update_Grid()
     switch (counter)
     {
         case 0:
-            LCD_Draw_Ship(  coord_array[counter][0],
+            LCD_DrawShip(  coord_array[counter][0],
                             coord_array[counter][1],
                             coord_array[counter][2],
                             coord_array[counter][3],
-                            coord_array[counter][4],
                             (valid_flag ? COLOR_GREEN : COLOR_RED));
 
-            Set_Dot(coord_array[counter + 1], COLOR_WHITE);
-            Set_Dot(coord_array[counter + 2], COLOR_WHITE);
-            Set_Dot(coord_array[counter + 3], COLOR_WHITE);
-            Set_Dot(coord_array[counter + 4], COLOR_WHITE);
+            set_dot(coord_array[counter + 1][0],coord_array[counter + 1][1], COLOR_WHITE);
+            set_dot(coord_array[counter + 2][0],coord_array[counter + 2][1], COLOR_WHITE);
+            set_dot(coord_array[counter + 3][0],coord_array[counter + 3][1], COLOR_WHITE);
+            set_dot(coord_array[counter + 4][0],coord_array[counter + 4][1], COLOR_WHITE);
             break;
         case 1:
-            Set_Dot(coord_array[counter - 1], COLOR_GREEN);
-            LCD_Draw_Ship(  coord_array[counter][0],
+            set_dot(coord_array[counter - 1][0],coord_array[counter - 1][1], COLOR_GREEN);
+            LCD_DrawShip(  coord_array[counter][0],
                             coord_array[counter][1],
                             coord_array[counter][2],
                             coord_array[counter][3],
-                            coord_array[counter][4],
                             (valid_flag ? COLOR_GREEN : COLOR_RED));
-            Set_Dot(coord_array[counter + 1], COLOR_WHITE);
-            Set_Dot(coord_array[counter + 2], COLOR_WHITE);
-            Set_Dot(coord_array[counter + 3], COLOR_WHITE);
+            set_dot(coord_array[counter + 1][0],coord_array[counter + 1][1], COLOR_WHITE);
+            set_dot(coord_array[counter + 2][0],coord_array[counter + 2][1], COLOR_WHITE);
+            set_dot(coord_array[counter + 3][0],coord_array[counter + 3][1], COLOR_WHITE);
             break;
         case 2:
-            Set_Dot(coord_array[counter - 2], COLOR_GREEN);
-            Set_Dot(coord_array[counter - 1], COLOR_GREEN);
-            LCD_Draw_Ship(  coord_array[counter][0],
+            set_dot(coord_array[counter - 2][0],coord_array[counter - 2][1], COLOR_GREEN);
+            set_dot(coord_array[counter - 1][0],coord_array[counter - 1][1], COLOR_GREEN);
+            LCD_DrawShip(  coord_array[counter][0],
                             coord_array[counter][1],
                             coord_array[counter][2],
                             coord_array[counter][3],
-                            coord_array[counter][4],
                             (valid_flag ? COLOR_GREEN : COLOR_RED));
-            Set_Dot(coord_array[counter + 1], COLOR_WHITE);
-            Set_Dot(coord_array[counter + 2], COLOR_WHITE);
+            set_dot(coord_array[counter + 1][0],coord_array[counter + 1][1], COLOR_WHITE);
+            set_dot(coord_array[counter + 2][0],coord_array[counter + 2][1], COLOR_WHITE);
             break;
         case 3:
-            Set_Dot(coord_array[counter - 3], COLOR_GREEN);
-            Set_Dot(coord_array[counter - 2], COLOR_GREEN);
-            Set_Dot(coord_array[counter - 1], COLOR_GREEN);
-            LCD_Draw_Ship(  coord_array[counter][0],
+            set_dot(coord_array[counter - 3][0],coord_array[counter - 3][1], COLOR_GREEN);
+            set_dot(coord_array[counter - 2][0],coord_array[counter - 2][1], COLOR_GREEN);
+            set_dot(coord_array[counter - 1][0],coord_array[counter - 1][1], COLOR_GREEN);
+            LCD_DrawShip(  coord_array[counter][0],
                             coord_array[counter][1],
                             coord_array[counter][2],
                             coord_array[counter][3],
-                            coord_array[counter][4],
                             (valid_flag ? COLOR_GREEN : COLOR_RED));
-            Set_Dot(coord_array[counter + 1], COLOR_WHITE);
+            set_dot(coord_array[counter + 1][0],coord_array[counter + 1][1], COLOR_WHITE);
             break;
         case 4:
-            Set_Dot(coord_array[counter - 4], COLOR_GREEN);
-            Set_Dot(coord_array[counter - 3], COLOR_GREEN);
-            Set_Dot(coord_array[counter - 2], COLOR_GREEN);
-            Set_Dot(coord_array[counter - 1], COLOR_GREEN);
-            LCD_Draw_Ship(  coord_array[counter][0],
+            set_dot(coord_array[counter - 4][0],coord_array[counter - 4][1], COLOR_GREEN);
+            set_dot(coord_array[counter - 3][0],coord_array[counter - 3][1], COLOR_GREEN);
+            set_dot(coord_array[counter - 2][0],coord_array[counter - 2][1], COLOR_GREEN);
+            set_dot(coord_array[counter - 1][0],coord_array[counter - 1][1], COLOR_GREEN);
+            LCD_DrawShip(  coord_array[counter][0],
                             coord_array[counter][1],
                             coord_array[counter][2],
                             coord_array[counter][3],
-                            coord_array[counter][4],
                             (valid_flag ? COLOR_GREEN : COLOR_RED));
             break;
         default:
@@ -114,16 +110,16 @@ void mv_up()
     check_mv_up();
     if(state == 0 && can_move)
     {
-        LCD_Draw_Ship(  coord_array[counter][0],
+        LCD_DrawShip(  coord_array[counter][0],
         coord_array[counter][1],
         coord_array[counter][2],
         coord_array[counter][3],
-        coord_array[counter][4],
         COLOR_WHITE);
         //set_ship state
         // y1--;
         // y2--;
-        coord_array[counter][1] = coord_array[counter][0] - 1;
+        coord_array[counter][1] = coord_array[counter][1] - 1;
+        coord_array[counter][3] = coord_array[counter][3] - 1;
         //need to update the ship drawn.
         Update_Grid();  
     }
@@ -140,17 +136,16 @@ void mv_down()
     check_mv_down();
     if(state == 0 && can_move)
     {
-        LCD_Draw_Ship(  coord_array[counter][0],
+        LCD_DrawShip(  coord_array[counter][0],
         coord_array[counter][1],
         coord_array[counter][2],
         coord_array[counter][3],
-        coord_array[counter][4],
         COLOR_WHITE);
         //set_ship state
         // y1++;
         // y2++;
-        coord_array[counter][1] = coord_array[counter][0] + 1;
-        coord_array[counter][3] = coord_array[counter][2] + 1;
+        coord_array[counter][1] = coord_array[counter][1] + 1;
+        coord_array[counter][3] = coord_array[counter][3] + 1;
                 //need to update the ship drawn.
         Update_Grid();
         
@@ -168,11 +163,10 @@ void mv_left()
     check_mv_left();
     if(state == 0 && can_move)
     {
-        LCD_Draw_Ship(  coord_array[counter][0],
+        LCD_DrawShip(  coord_array[counter][0],
         coord_array[counter][1],
         coord_array[counter][2],
         coord_array[counter][3],
-        coord_array[counter][4],
         COLOR_WHITE);
         //update the array based on new x1, x2 coords. //x1 -- , x2--
         coord_array[counter][0] = coord_array[counter][0] - 1;
@@ -197,11 +191,10 @@ void mv_right()
     {
         //set_ship state: mv_right refers to moving the ship rightwards.
         //make the ship's old position white.
-        LCD_Draw_Ship(  coord_array[counter][0],
+        LCD_DrawShip(  coord_array[counter][0],
                 coord_array[counter][1],
                 coord_array[counter][2],
                 coord_array[counter][3],
-                coord_array[counter][4],
                 COLOR_WHITE);
         //update the array based on new x1, x2 coords. x1 ++, x2 ++
         coord_array[counter][0] = coord_array[counter][0] + 1;
@@ -225,22 +218,29 @@ void mv_rot()
     check_mv_rot();
     //orientation is changed to new_orientation.
     if(state == 0 && can_move){
-            //make the old ship white.
-                LCD_Draw_Ship(  coord_array[counter][0],
+        //make the old ship white.
+        LCD_DrawShip(  coord_array[counter][0],
                 coord_array[counter][1],
                 coord_array[counter][2],
                 coord_array[counter][3],
-                coord_array[counter][4],
                 COLOR_WHITE);
-        orientation = (orientation == 4)? 1: orientation++;
+        // orientation = (orientation == 4)? 1: orientation++;
+        if(orientation == 4)
+        {
+            orientation = 1;
+        }
+        else
+        {
+            orientation++;
+        }
 
         //based on new_orientation, need to change the x2, y2 coordinates. since x1, y1 are the pivot points
         //for the rotation.
         switch(orientation)
         {
             case(1): 
-                    coord_array[counter][2] = coord_array[counter][0];
-                    coord_array[counter][3] = coord_array[counter][1] + 1; 
+                    coord_array[counter][2] = coord_array[counter][0]; //x2 update
+                    coord_array[counter][3] = coord_array[counter][1] - 1;  //y2 update
                     break;  
             case(2):
                     coord_array[counter][2] = coord_array[counter][0] + 1;
@@ -248,7 +248,7 @@ void mv_rot()
                     break;
             case(3):
                     coord_array[counter][2] = coord_array[counter][0] ;
-                    coord_array[counter][3] = coord_array[counter][1] - 1;
+                    coord_array[counter][3] = coord_array[counter][1] + 1;
                     break;
             case(4):
                     coord_array[counter][2] = coord_array[counter][0] - 1;
@@ -257,6 +257,7 @@ void mv_rot()
         }
         Update_Grid();
     }
+    //if cannot move. then should be stuck in the same?
 }
 
 void check_overlap(int temp_orientation, int temp_coord1, int temp_coord2){
@@ -314,7 +315,7 @@ void check_mv_rot()
     {
         case(1): 
                 x2_temp = coord_array[counter][0];
-                y2_temp = coord_array[counter][1] + 1; 
+                y2_temp = coord_array[counter][1] - 1; 
                 break;  
         case(2):
                 x2_temp = coord_array[counter][0] + 1;
@@ -322,7 +323,7 @@ void check_mv_rot()
                 break;
         case(3):
                 x2_temp = coord_array[counter][0] ;
-                y2_temp = coord_array[counter][1] - 1;
+                y2_temp = coord_array[counter][1] + 1;
                 break;
         case(4):
                 x2_temp = coord_array[counter][0] - 1;
