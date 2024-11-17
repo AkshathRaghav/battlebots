@@ -11,6 +11,7 @@ void internal_clock();
 // Setup needed for SysTick
 void initc();
 void initb();
+void inita(); 
 
 // Keyboard Handling
 void set_col(int col);
@@ -18,6 +19,7 @@ void init_systick();
 
 // Set up needed for USART
 void init_usart5();
+void init_usart1(); 
 
 // Setup needed for TTY Interfacing for Terminal 
 void enable_tty_interrupt(void);

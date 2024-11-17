@@ -14,31 +14,10 @@ void mv_up();
 void mv_down(); 
 void start_up();
 
-void send_data(int8_t msg){
-  //Waiting until the Tx data registor is not empty 
-  while (!(USART1->ISR & USART_ISR_TXE)){};
-  
-  USART1->TDR  = msg;
-
-  for(int i =0 ; i < 1000000; i ++); 
-  GPIOC->ODR &= ~(GPIO_ODR_9); 
-}
-
-int8_t read_data(){
-  //Waiting until the usart data registor is not empty 
-  while(!(USART1->ISR & USART_ISR_RXNE)){};
-
-  
-
-  int x = USART1->RDR; 
-  return x; 
-}
-
 // Routes logic to game
 void SysTick_Handler() {
     // if(state == 0 || state == 1) then flash the grid
     // if the value of grid is 0, there is nothing, 1 means there is a ship, 2 means there are 2 ships there
-
     if(counter >= sizeof(ship_sizes)/sizeof(ship_sizes[0])){ // done placing ships - move on 
         state = 1; // after done with setting ships, bomb ships state starts
     }
@@ -51,20 +30,14 @@ void SysTick_Handler() {
     }
 
     if(current_col == 3)
-    { 
+    {
       if(GPIOC_IDR & 0x1)
       {
-
+        // # symbol. R4, C3
         confirm();
       }
       else if(GPIOC_IDR & 0x4)
       {
-        
-
-        GPIOC->ODR |= GPIO_ODR_9;
-
-        send_data(1);
-        
         //6. R2, C3
         mv_right();
       }
@@ -74,16 +47,6 @@ void SysTick_Handler() {
     {
       if(GPIOC_IDR & 0x2)
       {
-
-        GPIOC->ODR |= GPIO_ODR_8; 
-
-        int x = read_data();
-        
-        if (x == 1){
-        for(int i = 0; i < 1000000; i ++);
-          GPIOC->ODR &= ~(GPIO_ODR_8); 
-        }
-
         //8 R3, C2
         mv_down();
       }
@@ -140,13 +103,10 @@ int main() {
     // SysTick + Keyboard 
     initb();
     initc();
-    inita(); 
     init_systick();
 
     // Terminal
     init_usart5();
-    init_usart1(); 
-
     enable_tty_interrupt();
     setbuf(stdin,0);
     setbuf(stdout,0);

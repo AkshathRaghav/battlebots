@@ -9,6 +9,15 @@ void initc() {
   GPIOC->MODER &= ~ (0x000000FF); 
   GPIOC->PUPDR|= 0x000000AA;
   GPIOC->MODER |= (0x00055500);
+
+  //testing usart 
+
+  GPIOC->MODER &= ~GPIO_MODER_MODER9;
+  GPIOC->MODER |= GPIO_MODER_MODER9_0;  
+
+
+  GPIOC->MODER &= ~GPIO_MODER_MODER8;
+  GPIOC->MODER |= GPIO_MODER_MODER8_0;  
 }
 
 void initb() {
@@ -18,6 +27,40 @@ void initb() {
 
   GPIOB->MODER |= (0x00550000); 
 
+}
+
+void inita(){    
+    RCC->AHBENR |= RCC_AHBENR_GPIOAEN; 
+
+    GPIOA->MODER &= ~(GPIO_MODER_MODER9 | GPIO_MODER_MODER10);
+
+    GPIOA->MODER |= (GPIO_MODER_MODER9_1 | GPIO_MODER_MODER10_1); 
+
+    GPIOA->AFR[1] &= ~(0xF << 4); //clearing 4 bits for pa 9
+    GPIOA->AFR[1] &= ~(0xf << 8); //clearing 4 bits for pa 10
+
+    GPIOA->AFR[1] |= 0x1 << 4; // setting pa9 to af1 
+    GPIOA->AFR[1] |= 0x1 << 8;   // setting pa10 to af1
+}
+
+
+void init_usart1(){
+    RCC->APB2ENR |= RCC_APB2ENR_USART1EN; 
+
+    USART1->CR1 &= ~USART_CR1_UE; 
+    
+    USART1->CR1 &= ~USART_CR1_M; 
+    USART1->CR2 &= ~USART_CR2_STOP; 
+    USART1->CR1 &= ~USART_CR1_PCE;
+    USART1->CR1 &= ~USART_CR1_OVER8; 
+    USART1->BRR = 416; // 48M/115200
+    USART1->CR1 |= USART_CR1_TE; 
+    USART1->CR1 |= USART_CR1_RE; 
+
+    USART1->CR1 |= USART_CR1_UE; 
+
+    while (!(USART1->ISR & USART_ISR_TEACK));
+    while (!(USART1->ISR & USART_ISR_REACK));
 }
 
 // Keyboard Handling
