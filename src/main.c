@@ -59,12 +59,6 @@ void SysTick_Handler() {
       }
       else if(GPIOC_IDR & 0x4)
       {
-        
-
-        GPIOC->ODR |= GPIO_ODR_9;
-
-        send_data(1);
-        
         //6. R2, C3
         mv_right();
       }
@@ -74,16 +68,6 @@ void SysTick_Handler() {
     {
       if(GPIOC_IDR & 0x2)
       {
-
-        GPIOC->ODR |= GPIO_ODR_8; 
-
-        int x = read_data();
-        
-        if (x == 1){
-        for(int i = 0; i < 1000000; i ++);
-          GPIOC->ODR &= ~(GPIO_ODR_8); 
-        }
-
         //8 R3, C2
         mv_down();
       }
