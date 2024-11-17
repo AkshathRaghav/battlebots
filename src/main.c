@@ -370,21 +370,33 @@ void inita() {
 }
 
 int main() {
-    internal_clock();
-    init_usart5();
-    initb();
-    initc();
-    inita();
+    RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
 
-    enable_tty_interrupt();
-    setbuf(stdin,0);
-    setbuf(stdout,0);
-    setbuf(stderr,0);
+    GPIOC->MODER &= ~ (0x000003F3);
+    // GPIOB->PUPDR|= 0x000000A0;
 
-    setup();
+    GPIOC->MODER |= (0x00550000); 
 
-    init_systick();
+    GPIOC->BSRR = GPIO_BSRR_BS_9;
 
-    play();
+    
+      
+
+    // internal_clock();
+    // init_usart5();
+    // initb();
+    // initc();
+    // inita();
+
+    // enable_tty_interrupt();
+    // setbuf(stdin,0);
+    // setbuf(stdout,0);
+    // setbuf(stderr,0);
+
+    // setup();
+
+    // init_systick();
+
+    // play();
 }
 
