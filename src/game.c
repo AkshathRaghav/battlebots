@@ -1,12 +1,17 @@
 #include "game.h"
-    
-int init_flag = 0; // Ship Placement Toggle 
-int counter = 0;
+#include "intercomm.h"
+
 GameState state = LOADING_SCREEN; 
-int grid[SIZE][SIZE] = {0};
+int init_flag = 0; 
+int counter = 0;
+int hits[SIZE][SIZE] = {0}; // 0 is unattempted; 1 for missed; 2 is for hit
+int grid[SIZE][SIZE] = {0}; // Ships, 1 = ship is there, 0 = no ship 
 int ship_sizes[5] = {5, 4, 3, 3, 2};
 int orientation = 3;
 int valid_flag = 1;
+int cursor_x = 0; 
+int cursor_y = 0; 
+int ship_hit_counter = 0;
 
 int coord_array[5][4] = {
         {0, 0, 0, 4},
@@ -15,6 +20,9 @@ int coord_array[5][4] = {
         {0, 0, 0, 2},
         {0, 0, 0, 1}
     };
+
+int turn_flag = 0; // Gets initially set in main.c#SystickHandler
+
 
 void Game_Reset() {
     init_flag = 0; 
@@ -41,22 +49,104 @@ void Game_Reset() {
     }
 }
 
-void print_coord_array() {
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 4; j++) {
-            printf("%d ", coord_array[i][j]);
+void read_bomb(){
+    uint8_t recived_data = read_data(); 
+
+    int boomb_x = recived_data & 0xF; 
+    int boomb_y = (recived_data & 0xF0) >> 4; // Dumbass
+
+    // If there is a ship, send 255, else 0     
+    send_data(grid[boomb_x][boomb_y] == 1 ? (uint8_t)(255) : (uint8_t)0);
+}
+
+void Game_Confirm_Cursor() { 
+    // Only confirm move if not played before 
+    if (turn_flag) { 
+        // if your turn, send the x y coord
+        if (hits[cursor_x][cursor_y] == 0) { 
+            turn_flag = 0; 
+            send_data(((cursor_y << 4) | cursor_x));                                          
+            uint8_t received = read_data();     
+            // Missed data packet =  0
+            // Hit data packet = 255 
+            hits[cursor_x][cursor_y] = (received == 0) ? 1 : (received == 255) ? 2 : 0; 
+            ship_hit_counter = (received == (uint8_t)255) ? (ship_hit_counter + 1) : ship_hit_counter;
+            
+            // not an error, do not change
+            set_dot(cursor_y, cursor_x, ((received == 0) ? COLOR_BLACK : (received == 255) ? COLOR_RED : COLOR_PINK));
         }
-        printf("\n");
     }
 }
 
-void printGrid(int grid[SIZE][SIZE]) {
-    for(int i = 0; i < SIZE; i++){
-        for(int j = 0; j < SIZE; j++){
-            printf("%d", grid[i][j]);
-        }
-        printf("\n");
+
+void check_overlap_hits(int x, int y) { 
+    if (hits[x][y] != 0) valid_flag = 0; 
+}
+
+void Game_MvRight_Cursor() {
+    can_move = 1; 
+    check_bounds(0, 0, cursor_x + 1, cursor_y); 
+
+    valid_flag = 1; 
+    check_overlap_hits(cursor_x + 1, cursor_y);
+
+    if (can_move) { 
+        LCD_DrawCursor(COLOR_WHITE);
+        cursor_x++; 
+        LCD_DrawCursor((valid_flag ? COLOR_GREEN : COLOR_RED));
     }
+}
+
+void Game_MvDown_Cursor() { 
+    can_move = 1; 
+    check_bounds(0, 0, cursor_x, cursor_y + 1); 
+
+    valid_flag = 1; 
+    check_overlap_hits(cursor_x, cursor_y + 1);
+
+    if (can_move) { 
+        LCD_DrawCursor(COLOR_WHITE);
+        cursor_y++; 
+        LCD_DrawCursor((valid_flag ? COLOR_GREEN : COLOR_RED));
+    }
+}
+
+void Game_MvUp_Cursor() { 
+    can_move = 1; 
+    check_bounds(0, 0, cursor_x, cursor_y - 1); 
+
+    valid_flag = 1; 
+    check_overlap_hits(cursor_x, cursor_y - 1);
+
+    if (can_move) { 
+        LCD_DrawCursor(COLOR_WHITE);
+        cursor_y--; 
+        LCD_DrawCursor((valid_flag ? COLOR_GREEN : COLOR_RED));
+    }
+}
+
+void Game_MvLeft_Cursor() { 
+    can_move = 1; 
+    check_bounds(0, 0, cursor_x - 1, cursor_y); 
+
+    valid_flag = 1; 
+    check_overlap_hits(cursor_x - 1, cursor_y);
+
+    if (can_move) { 
+        LCD_DrawCursor(COLOR_WHITE);
+        cursor_x--; 
+        LCD_DrawCursor((valid_flag ? COLOR_GREEN : COLOR_RED));
+    }
+}
+
+void LCD_DrawCursor(Color color) { 
+    DrawShip( 
+        cursor_x,
+        cursor_y, 
+        cursor_x, 
+        cursor_y, 
+        color
+    );
 }
 
 void LCD_DrawShip(Color color) { 
@@ -71,69 +161,42 @@ void LCD_DrawShip(Color color) {
 
 void Game_MvUp() {
     check_mv_up();
-    if(state == SET_SHIPS && can_move)
-    {
-        LCD_DrawShip(COLOR_WHITE); // Clears old boundary
-        coord_array[counter][1] = coord_array[counter][1] - 1;  // y1 = y1 - 1; 
-        coord_array[counter][3] = coord_array[counter][3] - 1;  // y2 = y2 - 1
+    if (can_move) {
+        LCD_DrawShip(COLOR_WHITE); 
+        coord_array[counter][1] = coord_array[counter][1] - 1;  
+        coord_array[counter][3] = coord_array[counter][3] - 1; 
         LCD_DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED)); 
     }
-    else if(state == BOMB_SHIPS && can_move)
-    {
-        y_bomb--;
-    }
-    // valid_flag = 1;
 }
 
 void Game_MvDown() {
     check_mv_down();
-    if(state == SET_SHIPS && can_move)
-    {
-        LCD_DrawShip(COLOR_WHITE); // Clears old boundary
-        coord_array[counter][1] = coord_array[counter][1] + 1; // y1 = y1 + 1
-        coord_array[counter][3] = coord_array[counter][3] + 1; // y2 = y2 + 1   
+    if (can_move) {
+        LCD_DrawShip(COLOR_WHITE);
+        coord_array[counter][1] = coord_array[counter][1] + 1; 
+        coord_array[counter][3] = coord_array[counter][3] + 1;   
         LCD_DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED)); 
     }
-    else if(state == BOMB_SHIPS && can_move)
-    {
-        //play_game state 
-        y_bomb++;
-    }
-    // valid_flag = 1;
 }
 
 void Game_MvLeft() {
     check_mv_left();
-
-    if(state == SET_SHIPS && can_move)
-    {
+    if (can_move) {
         LCD_DrawShip(COLOR_WHITE);
         coord_array[counter][0] = coord_array[counter][0] - 1;
         coord_array[counter][2] = coord_array[counter][2] - 1;
         LCD_DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED)); 
     }
-    else if(state == BOMB_SHIPS && can_move)
-    {
-        //play_game state 
-        x_bomb--;
-    }
-    // valid_flag = 1;
 }
 
 void Game_MvRight() {
     check_mv_right();
-
-    if (state == SET_SHIPS && can_move) {
+    if (can_move) {
         LCD_DrawShip(COLOR_WHITE);
-        coord_array[counter][0] = coord_array[counter][0] + 1; // x1 = x1 + 1
-        coord_array[counter][2] = coord_array[counter][2] + 1; // x2 = x2 + 1
+        coord_array[counter][0] = coord_array[counter][0] + 1; 
+        coord_array[counter][2] = coord_array[counter][2] + 1; 
         LCD_DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED)); 
     }
-    else if(state == BOMB_SHIPS && can_move) {
-        // play_game state.
-        x_bomb++;
-    }
-    // valid_flag = 1;
 }
 
 void Game_MvRot() {
@@ -143,31 +206,36 @@ void Game_MvRot() {
     if (state == SET_SHIPS && can_move) {
         LCD_DrawShip(COLOR_WHITE);
 
-        if (orientation == 4) orientation = 1; 
-        else orientation++; 
-
+        orientation = (orientation == 4) ? 1 : (orientation + 1); 
+        
+        // Updating orientation 
         // Based on new_orientation, need to change the x2, y2 coordinates.
         // Since x1, y1 are the pivot points for the rotation.
         switch(orientation)
         {
+            //                0    1    2    3
+            // coord_array : x_1, y_1, x_2, y_2 
             case(1): 
+                    // (x_1, y_1, x_2, y_2) -> (x_1, y_1, x_1, y_1 + ship_size -1 )
                     coord_array[counter][2] = coord_array[counter][0]; 
-                    coord_array[counter][3] = coord_array[counter][1] - 1; 
+                    coord_array[counter][3] = coord_array[counter][1] - ship_sizes[counter] + 1; 
                     break;  
             case(2):
-                    coord_array[counter][2] = coord_array[counter][0] + 1;
+                    // (x_1, y_1, x_2, y_2) -> (x_1, y_1, x_1 + ship_size - 1, y_1)
+                    coord_array[counter][2] = coord_array[counter][0] + ship_sizes[counter] - 1;
                     coord_array[counter][3] = coord_array[counter][1];
                     break;
             case(3):
+                    // (x_1, y_1, x_2, y_2) -> (x_1, y_1, x_1, y_1 + 1) ?? 
                     coord_array[counter][2] = coord_array[counter][0] ;
-                    coord_array[counter][3] = coord_array[counter][1] + 1;
+                    coord_array[counter][3] = coord_array[counter][1] + ship_sizes[counter] - 1;
                     break;
             case(4):
-                    coord_array[counter][2] = coord_array[counter][0] - 1;
-                    coord_array[counter][3] = coord_array[counter][1];
+                    // (x_1, y_1, x_2, y_2) -> (x_1, y_1, x_1 - ship_size + 1, y_1); 
+                    coord_array[counter][2] = coord_array[counter][0] - ship_sizes[counter] + 1; 
+                    coord_array[counter][3] = coord_array[counter][1]; 
                     break;
         }
-
         LCD_DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED)); 
     }
 }
@@ -211,37 +279,45 @@ int _check(int coord) {
 }
 
 void check_bounds(int x1, int x2, int y1, int y2) {
-    return (_check(y1) || _check(y2) || _check(x1) || _check(x2)) ? 0 : 1; 
+    can_move = (_check(y1) || _check(y2) || _check(x1) || _check(x2)) ? 0 : 1; 
 }
 
 void check_mv_rot() {
-    int x2_temp, y2_temp;
-    int temp_orientation = (orientation == 4)? 1: orientation++;
-    can_move = 1;
+    int x1_temp = coord_array[counter][0];
+    int y1_temp = coord_array[counter][1];
+
+
+    int x2_temp = coord_array[counter][2];
+    int y2_temp = coord_array[counter][3];
+
+    int shipsize = ship_sizes[counter]; 
+
+    int temp_orientation = (orientation == 4)? 1: (orientation+ 1);
     
     switch (temp_orientation) {
         case(1): 
-                x2_temp = coord_array[counter][0];
-                y2_temp = coord_array[counter][1] - 1; 
+                x2_temp = x1_temp;
+                y2_temp = y1_temp - shipsize + 1; 
                 break;  
         case(2):
-                x2_temp = coord_array[counter][0] + 1;
-                y2_temp = coord_array[counter][1];
+                x2_temp = x1_temp + shipsize - 1; 
+                y2_temp = y1_temp; 
                 break;
         case(3):
-                x2_temp = coord_array[counter][0] ;
-                y2_temp = coord_array[counter][1] + 1;
+                x2_temp = x1_temp;
+                y2_temp = y1_temp + shipsize - 1; 
                 break;
         case(4):
-                x2_temp = coord_array[counter][0] - 1;
-                y2_temp = coord_array[counter][1];
+                x2_temp = x1_temp - shipsize + 1; 
+                y2_temp = y1_temp;
                 break;
     }
-    
-    check_bounds(coord_array[counter][0], x2_temp, coord_array[counter][1], y2_temp);
 
-    if (!valid_flag) can_move = 0;
-    else check_overlap(coord_array[counter][0], x2_temp, coord_array[counter][1], y2_temp);
+    can_move = 1;
+    valid_flag = 1; 
+
+    check_bounds(x1_temp, x2_temp, y1_temp, y2_temp);
+    check_overlap(y1_temp, y2_temp, x1_temp, x2_temp); 
 }
 
 void check_mv_up() {
@@ -259,9 +335,10 @@ void check_mv_down() {
     int y1_temp = coord_array[counter][1] + 1;
     int y2_temp = coord_array[counter][3] + 1;
 
-    can_move = 1;
-    check_bounds(coord_array[counter][0], coord_array[counter][2], y1_temp, y2_temp);
+    can_move = 1; 
 
+    check_bounds(coord_array[counter][0], coord_array[counter][2], y1_temp, y2_temp);
+    
     valid_flag = 1; 
     check_overlap(y1_temp, y2_temp, coord_array[counter][0], coord_array[counter][2]);
 }
@@ -304,7 +381,6 @@ void Game_Confirm() {
         counter++;
         init_flag = 1; 
     }
-
     valid_flag = 1; 
 }
 

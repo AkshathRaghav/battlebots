@@ -33,7 +33,6 @@ void inita(){
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN; 
 
     GPIOA->MODER &= ~(GPIO_MODER_MODER9 | GPIO_MODER_MODER10);
-
     GPIOA->MODER |= (GPIO_MODER_MODER9_1 | GPIO_MODER_MODER10_1); 
 
     GPIOA->AFR[1] &= ~(0xF << 4); //clearing 4 bits for pa 9
@@ -41,6 +40,9 @@ void inita(){
 
     GPIOA->AFR[1] |= 0x1 << 4; // setting pa9 to af1 
     GPIOA->AFR[1] |= 0x1 << 8;   // setting pa10 to af1
+
+    GPIOA->MODER &= ~(GPIO_MODER_MODER0); 
+    GPIOA->MODER |= GPIO_MODER_MODER0_0; 
 }
 
 

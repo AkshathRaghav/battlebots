@@ -208,11 +208,97 @@ void draw_R(int x_start, int y_start, int letter_height, int letter_width, Color
     LCD_DrawFillRectangle(x_start + 10, y_start + 17, x_start + 15, y_start + 30, color);
 }
 
-void draw_star(x_center, y_center, color) { 
+void draw_W(int x_start, int y_start, int letter_height, int letter_width, Color color) {
+    int line_thickness = letter_width / 5;  
+    int mid_gap = letter_width / 4;       
+    LCD_DrawFillRectangle(x_start, y_start, 
+                          x_start + line_thickness, y_start + letter_height, color);
+    LCD_DrawFillRectangle(x_start + letter_width - line_thickness, y_start, 
+                          x_start + letter_width, y_start + letter_height, color);
+    LCD_DrawFillRectangle(x_start + line_thickness + mid_gap, y_start + letter_height / 2, 
+                          x_start + letter_width - line_thickness - mid_gap, y_start + letter_height, color);
+    LCD_DrawFillRectangle(x_start, y_start + letter_height - line_thickness, 
+                          x_start + letter_width, y_start + letter_height, color);
+}
+
+void draw_I(int x_start, int y_start, int letter_height, int letter_width, Color color) {
+    int line_thickness = letter_width / 5; 
+    LCD_DrawFillRectangle(x_start, y_start, 
+                          x_start + letter_width, y_start + line_thickness, color);
+    LCD_DrawFillRectangle(x_start + (letter_width / 2) - (line_thickness / 2), y_start, 
+                          x_start + (letter_width / 2) + (line_thickness / 2), y_start + letter_height, color);
+    LCD_DrawFillRectangle(x_start, y_start + letter_height - line_thickness, 
+                          x_start + letter_width, y_start + letter_height, color);
+}
+
+void draw_N(int x_start, int y_start, int letter_height, int letter_width, Color color) {
+    int line_thickness = letter_width / 10;  
+    LCD_DrawFillRectangle(x_start, y_start, 
+                          x_start + line_thickness, y_start + letter_height, color);
+    LCD_DrawFillRectangle(x_start + letter_width - line_thickness, y_start, 
+                          x_start + letter_width, y_start + letter_height, color);
+    LCD_DrawLine(x_start + line_thickness, y_start, 
+                 x_start + letter_width - line_thickness, y_start + letter_height, COLOR_BLACK);
+    LCD_DrawLine(x_start + line_thickness + 1, y_start + 1, 
+            x_start + letter_width - line_thickness + 1, y_start + letter_height +1, COLOR_BLACK);    
+    LCD_DrawLine(x_start + line_thickness - 1, y_start - 1, 
+            x_start + letter_width - line_thickness - 1, y_start + letter_height - 1, COLOR_BLACK);           
+}
+
+void draw_exclamation_point(int x_start, int y_start, int letter_height, int letter_width, Color color) {
+    int line_thickness = letter_width / 5;  
+    int dot_height = letter_height / 5;    
+    y_start -= 2; 
+    LCD_DrawFillRectangle(x_start + (letter_width / 2) - (line_thickness / 2), y_start, 
+                          x_start + (letter_width / 2) + (line_thickness / 2), y_start + letter_height - dot_height, color);
+    y_start += 3;
+    LCD_DrawFillRectangle(x_start + (letter_width / 2) - (line_thickness / 2), y_start + letter_height - dot_height, 
+                          x_start + (letter_width / 2) + (line_thickness / 2), y_start + letter_height, color);
+}
+
+
+void draw_star(int x_center, int y_center, Color color) { 
     LCD_DrawLine(x_center - 10, y_center - 10, x_center + 10, y_center + 10, color);
     LCD_DrawLine(x_center + 10, y_center - 10, x_center - 10, y_center + 10, color);
     LCD_DrawLine(x_center, y_center - 10, x_center, y_center + 10, color);
     LCD_DrawLine(x_center - 10, y_center, x_center + 10, y_center, color);
+}
+
+void LCD_WaitScreen() { 
+    int x_start = 60; 
+    int y_start = 140; 
+    int letter_width = 20; 
+    int letter_height = 30; 
+    int space = 10;
+    Color color = COLOR_BLACK; 
+
+    draw_W(x_start, y_start, letter_height, letter_width, color); 
+    x_start += letter_width + space; 
+    draw_A(x_start, y_start, letter_height, letter_width, color); 
+    x_start += letter_width + space; 
+    draw_I(x_start, y_start, letter_height, letter_width, color); 
+    x_start += letter_width + space; 
+    draw_T(x_start, y_start, letter_height, letter_width, color); 
+    LCD_DrawFillRectangle(55, y_start + letter_height + 20, x_start + letter_width + 3, y_start + letter_height + 20 + 5, color);
+}
+
+void LCD_EndScreen() { 
+    int x_start = 60; 
+    int y_start = 140; 
+    int letter_width = 20; 
+    int letter_height = 30; 
+    int space = 10;
+    Color color = COLOR_BLACK; 
+
+    draw_E(x_start, y_start, letter_height, letter_width, color); 
+    x_start += letter_width + space; 
+    draw_N(x_start, y_start, letter_height, letter_width, color); 
+    x_start += letter_width + space; 
+    draw_O(x_start, y_start, letter_height, letter_width, color); 
+    x_start += letter_width + space; 
+    draw_exclamation_point(x_start, y_start, letter_height, letter_width, color); 
+    LCD_DrawFillRectangle(55, y_start + letter_height + 20, x_start + letter_width + 3, y_start + letter_height + 20 + 5, color);
+
 }
 
 void LCD_StartScreen() {
@@ -221,7 +307,7 @@ void LCD_StartScreen() {
     int letter_width = 20;
     int letter_height = 30;
     int space = 5;      
-    int color = 0000;   
+    Color color = COLOR_BLACK; 
 
     draw_B(x_start, y_start, letter_height, letter_width, color); 
     x_start += letter_width + space;
@@ -278,7 +364,4 @@ void LCD_StartScreen() {
     draw_T(x_start, y_start, letter_height, letter_width, color); 
 }
 
-void clear_f() { 
-    LCD_Clear(1111);
-}
 

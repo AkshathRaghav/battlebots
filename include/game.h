@@ -7,6 +7,7 @@
 typedef enum { 
     LOADING_SCREEN, 
     SET_SHIPS, 
+    WAIT_SCREEN,
     BOMB_SHIPS, 
     END_SCREEN
 } GameState; 
@@ -15,14 +16,23 @@ typedef enum {
 int orientation;
 int ship_sizes[5];
 extern int grid[SIZE][SIZE];
+extern int hits[SIZE][SIZE];
 int can_move;
-int x_bomb, y_bomb; 
+int cursor_x, cursor_y; 
 extern int valid_flag;
 extern GameState state; 
 extern int counter;
 extern int init_flag; 
 extern int coord_array[5][4];
+extern int turn_flag;
+extern int boomb_x; 
+extern int boomb_y; 
 
+extern int ship_hit_counter;
+
+void read_bomb(); 
+
+void Game_End_Screen(); 
 void LCD_DrawShip(Color color);
 void Game_MvRight(); 
 void Game_MvLeft(); 
@@ -41,3 +51,11 @@ void check_bounds(int x1, int x2, int y1, int y2);
 void Game_Start_Ships(); 
 void Game_Confirm();
 void Game_Reset();
+void LCD_DrawCursor(Color color); 
+void check_overlap_hits(int x, int y);
+void read_bomb();
+void Game_Confirm_Cursor();
+void Game_MvRight_Cursor();
+void Game_MvDown_Cursor();
+void Game_MvUp_Cursor();
+void Game_MvLeft_Cursor();
