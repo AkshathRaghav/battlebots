@@ -153,12 +153,12 @@ void DrawShip(int x1_idx, int y1_idx, int x2_idx, int y2_idx, Color color) {
 }
 
 void draw_B(int x_start, int y_start, int letter_height, int letter_width, Color color) {
-    LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + letter_height, color); // Left vertical bar
-    LCD_DrawFillRectangle(x_start + 5, y_start, x_start + 15, y_start + 5, color);       // Top horizontal bar
-    LCD_DrawFillRectangle(x_start + 5, y_start + 12, x_start + 15, y_start + 17, color); // Middle horizontal bar
-    LCD_DrawFillRectangle(x_start + 5, y_start + 25, x_start + 15, y_start + 30, color); // Bottom horizontal bar
-    LCD_DrawFillRectangle(x_start + 15, y_start + 5, x_start + 20, y_start + 12, color); // Top right vertical bar
-    LCD_DrawFillRectangle(x_start + 15, y_start + 17, x_start + 20, y_start + 25, color);// Bottom right vertical bar
+    LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + letter_height, color);
+    LCD_DrawFillRectangle(x_start + 5, y_start, x_start + 15, y_start + 5, color);      
+    LCD_DrawFillRectangle(x_start + 5, y_start + 12, x_start + 15, y_start + 17, color); 
+    LCD_DrawFillRectangle(x_start + 5, y_start + 25, x_start + 15, y_start + 30, color); 
+    LCD_DrawFillRectangle(x_start + 15, y_start + 5, x_start + 20, y_start + 12, color); 
+    LCD_DrawFillRectangle(x_start + 15, y_start + 17, x_start + 20, y_start + 25, color);
 }
 
 void draw_A(int x_start, int y_start, int letter_height, int letter_width, Color color) {
@@ -216,12 +216,12 @@ void draw_star(x_center, y_center, color) {
 }
 
 void LCD_StartScreen() {
-    int x_start = 50;   // Starting x-coordinate
-    int y_start = 60;   // Starting y-coordinate
+    int x_start = 50;   
+    int y_start = 60;   
     int letter_width = 20;
     int letter_height = 30;
-    int space = 5;      // Space between letters
-    int color = 0000;   // Color code for the text
+    int space = 5;      
+    int color = 0000;   
 
     draw_B(x_start, y_start, letter_height, letter_width, color); 
     x_start += letter_width + space;

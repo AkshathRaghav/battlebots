@@ -28,7 +28,7 @@ void SysTick_Handler() {
 
     if (current_col == 2) {
       if (GPIOC_IDR & 0x2) Game_MvDown(); // 8
-      else if (GPIOC_IDR & 0x4) Game_MvRot(); // 5
+      // else if (GPIOC_IDR & 0x4) Game_MvRot(); // 5
       else if (GPIOC_IDR & 0x8) Game_MvUp(); // 2
     }
 

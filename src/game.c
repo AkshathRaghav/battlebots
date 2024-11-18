@@ -50,7 +50,7 @@ void print_coord_array() {
     }
 }
 
-void printGrid(int grid[SIZE][SIZE]){
+void printGrid(int grid[SIZE][SIZE]) {
     for(int i = 0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
             printf("%d", grid[i][j]);
@@ -69,8 +69,7 @@ void LCD_DrawShip(Color color) {
     );
 }
 
-void Game_MvUp()
-{
+void Game_MvUp() {
     check_mv_up();
     if(state == SET_SHIPS && can_move)
     {
@@ -81,14 +80,12 @@ void Game_MvUp()
     }
     else if(state == BOMB_SHIPS && can_move)
     {
-        //play_game state 
         y_bomb--;
     }
     // valid_flag = 1;
 }
 
-void Game_MvDown()
-{
+void Game_MvDown() {
     check_mv_down();
     if(state == SET_SHIPS && can_move)
     {
@@ -105,8 +102,7 @@ void Game_MvDown()
     // valid_flag = 1;
 }
 
-void Game_MvLeft()
-{
+void Game_MvLeft() {
     check_mv_left();
 
     if(state == SET_SHIPS && can_move)
@@ -124,8 +120,7 @@ void Game_MvLeft()
     // valid_flag = 1;
 }
 
-void Game_MvRight()
-{
+void Game_MvRight() {
     check_mv_right();
 
     if (state == SET_SHIPS && can_move) {
@@ -141,8 +136,7 @@ void Game_MvRight()
     // valid_flag = 1;
 }
 
-void Game_MvRot()
-{
+void Game_MvRot() {
     check_mv_rot();
 
     // Orientation is changed to new_orientation.
@@ -157,8 +151,8 @@ void Game_MvRot()
         switch(orientation)
         {
             case(1): 
-                    coord_array[counter][2] = coord_array[counter][0]; //x2 update
-                    coord_array[counter][3] = coord_array[counter][1] - 1; // y2 update
+                    coord_array[counter][2] = coord_array[counter][0]; 
+                    coord_array[counter][3] = coord_array[counter][1] - 1; 
                     break;  
             case(2):
                     coord_array[counter][2] = coord_array[counter][0] + 1;
@@ -212,23 +206,20 @@ void check_overlap(int x1, int x2, int y1, int y2) {
     }
 }
 
-void check_bounds(int x1, int x2, int y1, int y2){
-    if(y1 < 0 || y1 > (SIZE-1) || y2 < 0 || y2 > (SIZE-1) || x1 < 0 || x1 > (SIZE-1) || x2 < 0 || x2 > (SIZE-1)){
-        can_move = 0;
-    }
-    else{
-        can_move = 1;
-    }
+int _check(int coord) { 
+    return (coord < 0 || coord > (SIZE-1));
 }
 
-void check_mv_rot()
-{
+void check_bounds(int x1, int x2, int y1, int y2) {
+    return (_check(y1) || _check(y2) || _check(x1) || _check(x2)) ? 0 : 1; 
+}
+
+void check_mv_rot() {
     int x2_temp, y2_temp;
     int temp_orientation = (orientation == 4)? 1: orientation++;
     can_move = 1;
     
-    switch(temp_orientation)
-    {
+    switch (temp_orientation) {
         case(1): 
                 x2_temp = coord_array[counter][0];
                 y2_temp = coord_array[counter][1] - 1; 
@@ -253,7 +244,7 @@ void check_mv_rot()
     else check_overlap(coord_array[counter][0], x2_temp, coord_array[counter][1], y2_temp);
 }
 
-void check_mv_up(){
+void check_mv_up() {
     int y1_temp = coord_array[counter][1] - 1;
     int y2_temp = coord_array[counter][3] - 1;
 
@@ -264,8 +255,7 @@ void check_mv_up(){
     check_overlap(y1_temp, y2_temp, coord_array[counter][0], coord_array[counter][2]);
 }
 
-void check_mv_down()
-{  
+void check_mv_down() {  
     int y1_temp = coord_array[counter][1] + 1;
     int y2_temp = coord_array[counter][3] + 1;
 
@@ -276,8 +266,7 @@ void check_mv_down()
     check_overlap(y1_temp, y2_temp, coord_array[counter][0], coord_array[counter][2]);
 }
 
-void check_mv_left()
-{
+void check_mv_left() {
     int x1_temp = coord_array[counter][0] - 1;
     int x2_temp = coord_array[counter][2] - 1;
 
@@ -288,8 +277,7 @@ void check_mv_left()
     check_overlap(coord_array[counter][1], coord_array[counter][3], x1_temp, x2_temp);   
 }
 
-void check_mv_right()
-{   
+void check_mv_right() {   
     int x1_temp = coord_array[counter][0] + 1;
     int x2_temp = coord_array[counter][2] + 1;
 
@@ -307,7 +295,7 @@ void Game_Confirm() {
     if (valid_flag) { 
         // Increment counter, toggle init_flag for main.c#SysTickHandler()
         LCD_DrawShip(COLOR_WHITE);
-        LCD_SetValidDots( // Uses the reverse grid XY system
+        LCD_SetValidDots( // Reverses the assumed XY orientation; Ping Akshath if needed.
             coord_array[counter][1],
             coord_array[counter][0],
             coord_array[counter][3],
