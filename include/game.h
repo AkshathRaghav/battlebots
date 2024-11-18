@@ -36,7 +36,7 @@ void check_mv_down();
 void check_mv_left();
 void check_mv_right();
 void check_mv_rot();
-void check_overlap(int temp_orientation, int temp_coord1, int temp_coord2);
+void check_overlap(int, int, int, int);
 void check_bounds(int x1, int x2, int y1, int y2);
 void Game_Start_Ships(); 
 void Game_Confirm();

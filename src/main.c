@@ -15,7 +15,9 @@ void SysTick_Handler() {
     }
     else{
       if (init_flag) {
-        check_overlap(orientation, coord_array[counter][1], coord_array[counter][3]);
+
+        check_bounds(coord_array[counter][0], coord_array[counter][1],coord_array[counter][2], coord_array[counter][3]);
+        check_overlap(coord_array[counter][1], coord_array[counter][0], coord_array[counter][3], coord_array[counter][2]);
         LCD_DrawShip(valid_flag ? COLOR_GREEN : COLOR_RED);
         init_flag = 0;
       }
@@ -35,7 +37,6 @@ void SysTick_Handler() {
     if (current_col == 1) {
       if(GPIOC_IDR & 0x4){
         Game_MvLeft(); // 4
-        wait(500);
       }
       else if(GPIOC->IDR & 0x1) { // * 
         if (state == LOADING_SCREEN) { 

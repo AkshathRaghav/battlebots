@@ -185,49 +185,46 @@ void Game_MvRot()
     // TODO: if cannot move. then should be stuck in the same?
 }
 
-void check_overlap(int temp_orientation, int temp_coord1, int temp_coord2){
-    switch (temp_orientation) {
-        case 1:
-            for(int i = temp_coord1; i >= temp_coord2; i--){
-                if(grid[coord_array[counter][0]][i] == 1){
-                    valid_flag = 0;
-                    return;
-                }
+void check_overlap(int x1, int x2, int y1, int y2) { 
+    int smaller, larger; 
+
+    if (y1 == y2) {
+        if (x1 < x2) { 
+            larger = x2; 
+            smaller = x1; 
+        } else {
+            larger = x1; 
+            smaller = x2; 
+        } 
+        for (int i = smaller; i <= larger; i++) { 
+            if (grid[i][y1] == 1) { 
+                valid_flag = 0; 
+                return; 
             }
-            break;
-        case 2:
-            for(int i = temp_coord1; i <= temp_coord2; i++){
-                if(grid[i][coord_array[counter][1]]== 1){
-                    valid_flag = 0;
-                    return;
-                }
+        }
+    } else { 
+        if (y1 < y2) { 
+            larger = y2; 
+            smaller = y1; 
+        } else {
+            larger = y1; 
+            smaller = y2; 
+        } 
+        for (int i = smaller; i <= larger; i++) { 
+            if (grid[x1][i] == 1) { 
+                valid_flag = 0; 
+                return;
             }
-            break;
-        case 3:
-            for(int i = temp_coord1; i <= temp_coord2; i++){
-                if(grid[coord_array[counter][0]][i] == 1){
-                    valid_flag = 0;
-                    return;
-                }
-            }
-            break;
-        case 4:
-            for(int i = temp_coord1; i >= temp_coord2; i--){
-                if(grid[i][coord_array[counter][1]] == 1){
-                    valid_flag = 0;
-                    return;
-                }
-            }
-            break;
+        }
     }
 }
 
 void check_bounds(int x1, int x2, int y1, int y2){
     if(y1 < 0 || y1 > (SIZE-1) || y2 < 0 || y2 > (SIZE-1) || x1 < 0 || x1 > (SIZE-1) || x2 < 0 || x2 > (SIZE-1)){
-        valid_flag = 0;
+        can_move = 0;
     }
     else{
-        valid_flag = 1;
+        can_move = 1;
     }
 }
 
@@ -260,72 +257,60 @@ void check_mv_rot()
     check_bounds(coord_array[counter][0], x2_temp, coord_array[counter][1], y2_temp);
 
     if (!valid_flag) can_move = 0;
-    else check_overlap(temp_orientation, x2_temp, y2_temp);
+    else check_overlap(coord_array[counter][0], x2_temp, coord_array[counter][1], y2_temp);
 }
 
 void check_mv_up(){
     int y1_temp = coord_array[counter][1] - 1;
     int y2_temp = coord_array[counter][3] - 1;
-    can_move = 1;
 
+    can_move = 1;
     check_bounds(coord_array[counter][0], coord_array[counter][2], y1_temp, y2_temp); // check if the move up operation will cause out of bounds error
     
-    if (!valid_flag) can_move = 0;
-    else check_overlap(orientation, y1_temp, y2_temp);
+    check_overlap(y1_temp, coord_array[counter][0], y1_temp, coord_array[counter][2]);
 }
 
 void check_mv_down()
 {  
     int y1_temp = coord_array[counter][1] + 1;
     int y2_temp = coord_array[counter][3] + 1;
-    can_move = 1;
 
+    can_move = 1;
     check_bounds(coord_array[counter][0], coord_array[counter][2], y1_temp, y2_temp);
 
-    if(!valid_flag) can_move = 0;
-    else check_overlap(orientation, y1_temp, y2_temp);
+    check_overlap(y1_temp, coord_array[counter][0], y1_temp, coord_array[counter][2]);
 }
 
 void check_mv_left()
 {
     int x1_temp = coord_array[counter][0] - 1;
     int x2_temp = coord_array[counter][2] - 1;
-    can_move = 1;
 
+    can_move = 1;
     check_bounds(x1_temp, x2_temp, coord_array[counter][1], coord_array[counter][3]);
 
-    if(!valid_flag){
-        can_move = 0;
-    }
-    else{
-        check_overlap(orientation, x1_temp, x2_temp);   
-    }
+    check_overlap(coord_array[counter][1], x1_temp, coord_array[counter][3], x2_temp);   
 }
 
 void check_mv_right()
 {   
     int x1_temp = coord_array[counter][0] + 1;
     int x2_temp = coord_array[counter][2] + 1;
+    
     can_move = 1;
-
     check_bounds(x1_temp, x2_temp, coord_array[counter][1], coord_array[counter][3]);
 
-    if (!valid_flag){
-        can_move = 0;
-    }
-    else{
-        check_overlap(orientation, x1_temp, x2_temp);
-    }
+    check_overlap(coord_array[counter][1], x1_temp, coord_array[counter][3], x2_temp);   
 }
 
 void Game_Confirm() {
-    check_overlap(orientation, coord_array[counter][0], coord_array[counter][2]);
-    check_bounds(coord_array[counter][0], coord_array[counter][1],coord_array[counter][2], coord_array[counter][3]);
+    check_overlap(coord_array[counter][1], coord_array[counter][0], coord_array[counter][3], coord_array[counter][2]);
+    check_bounds(coord_array[counter][0], coord_array[counter][2],coord_array[counter][1], coord_array[counter][3]);
     
     if (valid_flag) { 
         // Increment counter, toggle init_flag for main.c#SysTickHandler()
         LCD_DrawShip(COLOR_WHITE);
-        LCD_SetValidDots(
+        LCD_SetValidDots( // Uses the reverse grid XY system
             coord_array[counter][1],
             coord_array[counter][0],
             coord_array[counter][3],
@@ -335,8 +320,6 @@ void Game_Confirm() {
         init_flag = 1; 
     }
 }
-
-
 
 void Game_Start_Ships() {
     counter = 0;
