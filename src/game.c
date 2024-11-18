@@ -78,7 +78,6 @@ void Game_MvUp()
         coord_array[counter][1] = coord_array[counter][1] - 1;  // y1 = y1 - 1; 
         coord_array[counter][3] = coord_array[counter][3] - 1;  // y2 = y2 - 1
         LCD_DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED)); 
-  
     }
     else if(state == BOMB_SHIPS && can_move)
     {
@@ -113,11 +112,8 @@ void Game_MvLeft()
     if(state == SET_SHIPS && can_move)
     {
         LCD_DrawShip(COLOR_WHITE);
-        // update the array based on new x1, x2 coords. //x1 -- , x2--
         coord_array[counter][0] = coord_array[counter][0] - 1;
         coord_array[counter][2] = coord_array[counter][2] - 1;
-
-        // need to update the ship drawn.
         LCD_DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED)); 
     }
     else if(state == BOMB_SHIPS && can_move)
@@ -180,9 +176,6 @@ void Game_MvRot()
 
         LCD_DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED)); 
     }
-
-    set_dot(0, 0, COLOR_RED);
-    // TODO: if cannot move. then should be stuck in the same?
 }
 
 void check_overlap(int x1, int x2, int y1, int y2) { 
@@ -267,7 +260,8 @@ void check_mv_up(){
     can_move = 1;
     check_bounds(coord_array[counter][0], coord_array[counter][2], y1_temp, y2_temp); // check if the move up operation will cause out of bounds error
     
-    check_overlap(y1_temp, coord_array[counter][0], y1_temp, coord_array[counter][2]);
+    valid_flag = 1; 
+    check_overlap(y1_temp, y2_temp, coord_array[counter][0], coord_array[counter][2]);
 }
 
 void check_mv_down()
@@ -278,7 +272,8 @@ void check_mv_down()
     can_move = 1;
     check_bounds(coord_array[counter][0], coord_array[counter][2], y1_temp, y2_temp);
 
-    check_overlap(y1_temp, coord_array[counter][0], y1_temp, coord_array[counter][2]);
+    valid_flag = 1; 
+    check_overlap(y1_temp, y2_temp, coord_array[counter][0], coord_array[counter][2]);
 }
 
 void check_mv_left()
@@ -289,23 +284,25 @@ void check_mv_left()
     can_move = 1;
     check_bounds(x1_temp, x2_temp, coord_array[counter][1], coord_array[counter][3]);
 
-    check_overlap(coord_array[counter][1], x1_temp, coord_array[counter][3], x2_temp);   
+    valid_flag = 1; 
+    check_overlap(coord_array[counter][1], coord_array[counter][3], x1_temp, x2_temp);   
 }
 
 void check_mv_right()
 {   
     int x1_temp = coord_array[counter][0] + 1;
     int x2_temp = coord_array[counter][2] + 1;
-    
+
     can_move = 1;
     check_bounds(x1_temp, x2_temp, coord_array[counter][1], coord_array[counter][3]);
 
-    check_overlap(coord_array[counter][1], x1_temp, coord_array[counter][3], x2_temp);   
+    valid_flag = 1; 
+    check_overlap(coord_array[counter][1], coord_array[counter][3], x1_temp, x2_temp);   
 }
 
 void Game_Confirm() {
-    check_overlap(coord_array[counter][1], coord_array[counter][0], coord_array[counter][3], coord_array[counter][2]);
-    check_bounds(coord_array[counter][0], coord_array[counter][2],coord_array[counter][1], coord_array[counter][3]);
+    valid_flag = 1; 
+    check_overlap(coord_array[counter][1], coord_array[counter][3], coord_array[counter][0], coord_array[counter][2]);
     
     if (valid_flag) { 
         // Increment counter, toggle init_flag for main.c#SysTickHandler()
@@ -319,6 +316,8 @@ void Game_Confirm() {
         counter++;
         init_flag = 1; 
     }
+
+    valid_flag = 1; 
 }
 
 void Game_Start_Ships() {

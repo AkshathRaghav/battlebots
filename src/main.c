@@ -15,10 +15,8 @@ void SysTick_Handler() {
     }
     else{
       if (init_flag) {
-
-        check_bounds(coord_array[counter][0], coord_array[counter][1],coord_array[counter][2], coord_array[counter][3]);
-        check_overlap(coord_array[counter][1], coord_array[counter][0], coord_array[counter][3], coord_array[counter][2]);
-        LCD_DrawShip(valid_flag ? COLOR_GREEN : COLOR_RED);
+        check_overlap(coord_array[counter][1], coord_array[counter][3], coord_array[counter][0], coord_array[counter][2]);
+        LCD_DrawShip((valid_flag ? COLOR_GREEN : COLOR_RED));
         init_flag = 0;
       }
     }
@@ -41,7 +39,7 @@ void SysTick_Handler() {
       else if(GPIOC->IDR & 0x1) { // * 
         if (state == LOADING_SCREEN) { 
             LCD_Clear(COLOR_WHITE);
-            LCD_DrawGrid(); 
+            // LCD_DrawGrid(); 
             LCD_DrawCoords(); 
             state = SET_SHIPS; 
             Game_Start_Ships(); 
@@ -76,7 +74,7 @@ int main() {
     LCD_StartScreen(); 
 
     // set_dot(0, 0, COLOR_GREEN);
-    // set_dot(4, 0, COLOR_BLUE);
+    // set_dot(4, 0, COLOR_WHITE);
     // set_dot(0, 4, COLOR_RED);
 }
    

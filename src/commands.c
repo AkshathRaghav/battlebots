@@ -98,7 +98,7 @@ void LCD_DrawCoords() {
             int y1 = y - 5;
             int x2 = x + 5;
             int y2 = y + 5;
-            LCD_DrawFillRectangle(x1, y1, x2, y2, 0000); 
+            LCD_DrawFillRectangle(x1, y1, x2, y2, COLOR_BLUE); 
         }
     }
 }
