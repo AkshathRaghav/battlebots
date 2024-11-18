@@ -6,10 +6,6 @@
 #include <stdio.h>
 
 
-int len(int ship_sizes[]) {
-    return sizeof(ship_sizes) / sizeof(ship_sizes[0]);
-}
-
 void lcd_init(int argc, char *argv[])
 {
     LCD_Setup();
@@ -107,15 +103,37 @@ void LCD_DrawCoords() {
     }
 }
 
-void LCD_DrawShip(int x1_idx, int y1_idx, int x2_idx, int y2_idx, Color color) {
-    int dot_count = 0;
-    
-    if (x1_idx == x2_idx) {
-        dot_count = abs(y2_idx - y1_idx) + 1;
-    } else if (y1_idx == y2_idx) { 
-        dot_count = abs(x2_idx - x1_idx) + 1;
+void LCD_SetValidDots(int x1, int y1, int x2, int y2) { 
+    int smaller, larger; 
+
+    if (y1 == y2) {
+        if (x1 < x2) { 
+            larger = x2; 
+            smaller = x1; 
+        } else {
+            larger = x1; 
+            smaller = x2; 
+        } 
+        for (int i = smaller; i <= larger; i++) { 
+            set_dot(i, y1, COLOR_GREEN);
+            grid[i][y1] = 1; 
+        }
+    } else { 
+        if (y1 < y2) { 
+            larger = y2; 
+            smaller = y1; 
+        } else {
+            larger = y1; 
+            smaller = y2; 
+        } 
+        for (int i = smaller; i <= larger; i++) { 
+            set_dot(x1, i, COLOR_GREEN);
+            grid[x1][i] = 1; 
+        }
     }
-    
+}
+
+void DrawShip(int x1_idx, int y1_idx, int x2_idx, int y2_idx, Color color) {
     int x1_start, y1_start, x1_end, y1_end;
     int x2_start, y2_start, x2_end, y2_end;
     get_dot_bbox(y1_idx, x1_idx, &x1_start, &y1_start, &x1_end, &y1_end);
@@ -134,7 +152,7 @@ void LCD_DrawShip(int x1_idx, int y1_idx, int x2_idx, int y2_idx, Color color) {
     }
 }
 
-void draw_B(x_start, y_start, letter_height, letter_width, color) { 
+void draw_B(int x_start, int y_start, int letter_height, int letter_width, Color color) {
     LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + letter_height, color); // Left vertical bar
     LCD_DrawFillRectangle(x_start + 5, y_start, x_start + 15, y_start + 5, color);       // Top horizontal bar
     LCD_DrawFillRectangle(x_start + 5, y_start + 12, x_start + 15, y_start + 17, color); // Middle horizontal bar
@@ -143,38 +161,38 @@ void draw_B(x_start, y_start, letter_height, letter_width, color) {
     LCD_DrawFillRectangle(x_start + 15, y_start + 17, x_start + 20, y_start + 25, color);// Bottom right vertical bar
 }
 
-void draw_A(x_start, y_start, letter_height, letter_width, color) { 
+void draw_A(int x_start, int y_start, int letter_height, int letter_width, Color color) {
     LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + 30, color);
     LCD_DrawFillRectangle(x_start + 15, y_start, x_start + 20, y_start + 30, color);
     LCD_DrawFillRectangle(x_start + 5, y_start, x_start + 15, y_start + 5, color);
     LCD_DrawFillRectangle(x_start + 5, y_start + 15, x_start + 15, y_start + 20, color);
 }
 
-void draw_T(x_start, y_start, letter_height, letter_width, color) { 
+void draw_T(int x_start, int y_start, int letter_height, int letter_width, Color color) {
     LCD_DrawFillRectangle(x_start, y_start, x_start + 20, y_start + 5, color);
     LCD_DrawFillRectangle(x_start + 7, y_start, x_start + 13, y_start + 30, color);
 }
 
-void draw_L(x_start, y_start, letter_height, letter_width, color) { 
+void draw_L(int x_start, int y_start, int letter_height, int letter_width, Color color) {
     LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + 30, color);
     LCD_DrawFillRectangle(x_start, y_start + 25, x_start + 20, y_start + 30, color);
 }
 
-void draw_E(x_start, y_start, letter_height, letter_width, color) { 
+void draw_E(int x_start, int y_start, int letter_height, int letter_width, Color color) {
     LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + 30, color);
     LCD_DrawFillRectangle(x_start, y_start, x_start + 20, y_start + 5, color);
     LCD_DrawFillRectangle(x_start, y_start + 15, x_start + 15, y_start + 20, color);
     LCD_DrawFillRectangle(x_start, y_start + 25, x_start + 20, y_start + 30, color);
 }
 
-void draw_O(x_start, y_start, letter_height, letter_width, color) { 
+void draw_O(int x_start, int y_start, int letter_height, int letter_width, Color color) {
     LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + 30, color);
     LCD_DrawFillRectangle(x_start + 15, y_start, x_start + 20, y_start + 30, color);
     LCD_DrawFillRectangle(x_start + 5, y_start, x_start + 15, y_start + 5, color);
     LCD_DrawFillRectangle(x_start + 5, y_start + 25, x_start + 15, y_start + 30, color);
 }
 
-void draw_S(x_start, y_start, letter_height, letter_width, color) { 
+void draw_S(int x_start, int y_start, int letter_height, int letter_width, Color color) {
     LCD_DrawFillRectangle(x_start, y_start, x_start + 20, y_start + 5, color);
     LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + 15, color);
     LCD_DrawFillRectangle(x_start, y_start + 12, x_start + 20, y_start + 17, color);
@@ -182,7 +200,7 @@ void draw_S(x_start, y_start, letter_height, letter_width, color) {
     LCD_DrawFillRectangle(x_start, y_start + 25, x_start + 20, y_start + 30, color);
 }
 
-void draw_R(x_start, y_start, letter_height, letter_width, color) { 
+void draw_R(int x_start, int y_start, int letter_height, int letter_width, Color color) {
     LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + 30, color);
     LCD_DrawFillRectangle(x_start + 5, y_start, x_start + 15, y_start + 5, color);
     LCD_DrawFillRectangle(x_start + 5, y_start + 12, x_start + 15, y_start + 17, color);
@@ -264,106 +282,3 @@ void clear_f() {
     LCD_Clear(1111);
 }
 
-
-struct commands_t cmds[] = {
-        { "lcd_init", lcd_init },
-        { "clear",    clear },
-        { "clear_f",    clear_f },
-        { "drawline", drawline },
-        { "drawrect", drawrect },
-        { "drawfillrect", drawfillrect },
-        { "grid", LCD_DrawGrid },
-        { "dots", LCD_DrawCoords },
-        { "start", LCD_StartScreen },
-        { "set", set_dot },
-};
-
-// A weak definition that can be overridden by a better one.
-// Replace this with your own usercmds entirely.
-__attribute((weak)) struct commands_t usercmds[] = {
-        { 0, 0 }
-};
-
-void exec(int argc, char *argv[])
-{
-    //for(int i=0; i<argc; i++)
-    //    printf("%d: %s\n", i, argv[i]);
-    for(int i=0; usercmds[i].cmd != 0; i++)
-        if (strcmp(usercmds[i].cmd, argv[0]) == 0) {
-            usercmds[i].fn(argc, argv);
-            return;
-        }
-    for(int i=0; i<sizeof cmds/sizeof cmds[0]; i++)
-        if (strcmp(cmds[i].cmd, argv[0]) == 0) {
-            cmds[i].fn(argc, argv);
-            return;
-        }
-    printf("%s: No such command.\n", argv[0]);
-}
-
-void parse_command(char *c)
-{
-    char *argv[20];
-    int argc=0;
-    int skipspace=1;
-    for(; *c; c++) {
-        if (skipspace) {
-            if (*c != ' ' && *c != '\t') {
-                argv[argc++] = c;
-                skipspace = 0;
-            }
-        } else {
-            if (*c == ' ' || *c == '\t') {
-                *c = '\0';
-                skipspace=1;
-            }
-        }
-    }
-    if (argc > 0) {
-        argv[argc] = "";
-        exec(argc, argv);
-    }
-}
-
-static void insert_echo_string(const char *s)
-{
-    // This puts a string into the *input* stream, so it can be edited.
-    while(*s)
-        insert_echo_char(*s++);
-}
-
-void command_shell(void)
-{
-    // printf("\nEnter current "); fflush(stdout);
-    // insert_echo_string("date 20240213000000");
-    fflush(stdout);
-    char line[100];
-    line[99] = '\0';
-    int len = strlen(line);
-    if (line[len-1] == '\n')
-        line[len-1] = '\0';
-
-    puts("This is the STM32 command shell.");
-    puts("Type 'mount' before trying any file system commands.");
-    puts("Type 'lcd_init' before trying any draw commands.");
-
-    parse_command("lcd_init");
-    parse_command("start");
-
-    fgets(line, 99, stdin);
-    // parse_command(line);
-
-    parse_command("clear_f");
-    parse_command("grid");
-    parse_command("dots");
-
-    for(;;) {
-        printf("> ");
-        fgets(line, 99, stdin);
-        line[99] = '\0';
-        len = strlen(line);
-        if (line[len-1] == '\n')
-            line[len-1] = '\0';
-        parse_command(line);
-    }
-}

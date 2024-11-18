@@ -10,5 +10,6 @@
         "intercomm.h": "c",
         "string.h": "c",
         "lcd.h": "c"
-    }
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }

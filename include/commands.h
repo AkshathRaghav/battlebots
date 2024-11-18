@@ -1,11 +1,14 @@
 #ifndef __COMMANDS_H__
 #define __COMMANDS_H__
 
+#include "lcd.h"
+#define SIZE 8 
+
 typedef enum {
     COLOR_BLACK   = 0x0000,  // RGB(0, 0, 0)
     COLOR_WHITE   = 0xFFFF,  // RGB(31, 63, 31)
     COLOR_RED     = 0xF800,  // RGB(31, 0, 0)
-    COLOR_GREEN   = 0x07E0,  // RGB(0, 63, 0)
+    COLOR_GREEN   = 0x0f0f,  // RGB(0, 63, 0)
     COLOR_BLUE    = 0x001F,  // RGB(0, 0, 31)
     COLOR_YELLOW  = 0xFFE0,  // RGB(31, 63, 0)
     COLOR_CYAN    = 0x07FF,  // RGB(0, 63, 31)
@@ -23,13 +26,14 @@ struct commands_t {
     void      (*fn)(int argc, char *argv[]);
 };
 
+extern int grid[SIZE][SIZE];
 void command_shell(void);
-
 void LCD_Setup();
 void LCD_StartScreen(); 
 void LCD_DrawGrid(); 
+void LCD_SetValidDots(int x1, int y1, int x2, int y2);
 void LCD_DrawCoords(); 
-void LCD_DrawShip(int x1_idx, int y1_idx, int x2_idx, int y2_idx, Color color);
+void DrawShip(int x1_idx, int y1_idx, int x2_idx, int y2_idx, Color color);
 void set_dot(int x, int y, Color color);
 
 
