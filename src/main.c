@@ -116,13 +116,21 @@ void SysTick_Handler() {
       }
     }
 
-    else if(state == END_SCREEN){
-      if(init_flag == 0){
+    else if (state == END_SCREEN){
+      if (!init_flag){
         LCD_Clear(COLOR_WHITE);
+        LCD_EndScreen();  
         init_flag = 1; 
       } 
-      LCD_EndScreen();
+
+      if ((current_col == 1) && (GPIOC_IDR & 0x1)) {
+        state = LOADING_SCREEN; 
+        LCD_Clear(COLOR_WHITE); 
+        LCD_StartScreen(); 
+        Game_Reset(); 
+      }
     }
+
     if (done_first) {
       GPIOC->BSRR |= GPIO_BSRR_BR_8; 
     }

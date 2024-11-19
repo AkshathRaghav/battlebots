@@ -3,6 +3,7 @@
 
 void send_data(uint8_t msg) {
   // Waiting until the USART TX data registor is !empty 
+  clear_uart_errors(); 
   while (!(USART1->ISR & USART_ISR_TXE));
   USART1->TDR = msg;
 }
@@ -18,3 +19,14 @@ uint8_t read_data() {
   return x;
 }
 
+void clear_uart_errors() {
+  if (USART1->ISR & USART_ISR_ORE) {
+    volatile uint8_t dummy = USART1->RDR; 
+    (void)dummy;
+    USART1->ICR |= USART_ICR_ORECF;    
+  }
+  if (USART1->ISR & (USART_ISR_FE | USART_ISR_NE)) {
+    volatile uint8_t dummy = USART1->RDR; 
+    (void)dummy;
+  }
+}
