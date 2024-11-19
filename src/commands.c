@@ -5,6 +5,11 @@
 #include <string.h>
 #include <stdio.h>
 
+void debug_draw(){
+  for(int i = 0; i < SIZE; i ++ )
+    for(int j = 0; j < SIZE; j ++)
+      set_dot(i, j, grid[i][j] ? COLOR_GREEN : COLOR_PINK);
+}
 
 void lcd_init(int argc, char *argv[])
 {

@@ -30,7 +30,7 @@ extern int boomb_y;
 
 extern int ship_hit_counter;
 
-void read_bomb(); 
+void Game_ReadBomb(); 
 
 void Game_End_Screen(); 
 void LCD_DrawShip(Color color);
@@ -53,7 +53,7 @@ void Game_Confirm();
 void Game_Reset();
 void LCD_DrawCursor(Color color); 
 void check_overlap_hits(int x, int y);
-void read_bomb();
+void Game_ReadBomb();
 void Game_Confirm_Cursor();
 void Game_MvRight_Cursor();
 void Game_MvDown_Cursor();

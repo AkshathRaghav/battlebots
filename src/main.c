@@ -4,19 +4,9 @@ const char* team = "battlebots";
 volatile int current_col = 1; 
 int done_first = 1;
 
-// void debug_draw(){
-//   for(int i = 0; i < SIZE; i ++ )
-//     for(int j = 0; j < SIZE; j ++)
-//       set_dot(i, j, grid[i][j] ? COLOR_GREEN : COLOR_PINK);
-// }
 // Interrupt handler 
 // Main router interface on every interrupt-call
 void SysTick_Handler() {
-
-    // GPIOA->ODR ^= 1; 
-    // `state` tracks the part of the game logic we're in. 
-    // coord_array stores the start and end of each ship. Used in SET_SHIPS mode. 
-
     if (state == LOADING_SCREEN) { 
         if ((current_col == 1) & (GPIOC_IDR & 0x1)) { // * 
         LCD_Clear(COLOR_WHITE);
@@ -68,8 +58,8 @@ void SysTick_Handler() {
     else if (state == WAIT_SCREEN) { 
       init_flag = 1; 
 
-      send_data(255);
-      if (read_data() == (uint8_t)255) { 
+      COMM_SendData(255);
+      if (COMM_ReadData() == (uint8_t)255) { 
         turn_flag = done_first; 
         state = BOMB_SHIPS; 
         LCD_Clear(COLOR_WHITE);
@@ -79,26 +69,22 @@ void SysTick_Handler() {
 
     else if (state == BOMB_SHIPS) { 
       if (init_flag) { 
-        // debug_draw(); 
-        // while (1)
-        // {
-        //   /* code */
-        // }
-        
         valid_flag = 1; 
-        int ship_hit_counter = 0; 
+        ship_hit_counter = 0; 
         check_overlap_hits(cursor_x, cursor_y);
         LCD_DrawCursor(valid_flag ? COLOR_GREEN : COLOR_RED);
         init_flag = 0; 
       }
 
       if (turn_flag) { 
-        if(ship_hit_counter >= 3){
+        LCD_DrawCursor(valid_flag ? COLOR_GREEN : COLOR_RED);
+        if (ship_hit_counter >= 17){
+          COMM_SendData(69); // Transmitting LOST. 
           state = END_SCREEN; 
           ship_hit_counter = 0; 
         }
         else{
-          if(current_col == 3) {
+          if (current_col == 3) {
             if (GPIOC_IDR & 0x1) Game_Confirm_Cursor(); // #
             else if (GPIOC_IDR & 0x4) Game_MvRight_Cursor(); // 6
           }
@@ -111,7 +97,8 @@ void SysTick_Handler() {
           }
         }
       } else { 
-        read_bomb();
+        LCD_DrawCursor(COLOR_WHITE);
+        Game_ReadBomb();
         turn_flag = 1; 
       }
     }
@@ -129,10 +116,6 @@ void SysTick_Handler() {
         LCD_StartScreen(); 
         Game_Reset(); 
       }
-    }
-
-    if (done_first) {
-      GPIOC->BSRR |= GPIO_BSRR_BR_8; 
     }
 
     current_col++;

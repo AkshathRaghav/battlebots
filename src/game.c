@@ -30,6 +30,10 @@ void Game_Reset() {
     state = LOADING_SCREEN; 
     orientation = 3;
     valid_flag = 1;
+    cursor_y = 0; 
+    ship_hit_counter = 0;
+    cursor_x = 0; 
+    
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             grid[i][j] = 0;
@@ -49,14 +53,18 @@ void Game_Reset() {
     }
 }
 
-void read_bomb(){
-    uint8_t recived_data = read_data(); 
+void Game_ReadBomb(){
+    uint8_t recived_data = COMM_ReadData(); 
+    
+    // if (recived_data == (uint8_t)(69)) { 
+    //     state = END
+    // }
 
     int boomb_x = recived_data & 0xF; 
     int boomb_y = (recived_data & 0xF0) >> 4; // Dumbass
 
-    // If there is a ship, send 255, else 0     
-    send_data(grid[boomb_x][boomb_y] == 1 ? (uint8_t)(255) : (uint8_t)0);
+    // If there is a ship, send 255, else 0 
+    COMM_SendData(grid[boomb_x][boomb_y] == 1 ? (uint8_t)(255) : (uint8_t)0);
 }
 
 void Game_Confirm_Cursor() { 
@@ -65,12 +73,13 @@ void Game_Confirm_Cursor() {
         // if your turn, send the x y coord
         if (hits[cursor_x][cursor_y] == 0) { 
             turn_flag = 0; 
-            send_data(((cursor_y << 4) | cursor_x));                                          
-            uint8_t received = read_data();     
+            COMM_SendData(((cursor_y << 4) | cursor_x));                                          
+            uint8_t received = COMM_ReadData();     
+
             // Missed data packet =  0
             // Hit data packet = 255 
             hits[cursor_x][cursor_y] = (received == 0) ? 1 : (received == 255) ? 2 : 0; 
-            ship_hit_counter = (received == (uint8_t)255) ? (ship_hit_counter + 1) : ship_hit_counter;
+            ship_hit_counter = (received == (uint8_t) 255) ? (ship_hit_counter + 1) : ship_hit_counter;
             
             // not an error, do not change
             set_dot(cursor_y, cursor_x, ((received == 0) ? COLOR_BLACK : (received == 255) ? COLOR_RED : COLOR_PINK));

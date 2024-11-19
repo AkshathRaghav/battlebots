@@ -28,6 +28,8 @@ struct commands_t {
 };
 
 extern int grid[SIZE][SIZE];
+
+void debug_draw(); 
 void command_shell(void);
 void LCD_Setup();
 void LCD_StartScreen(); 

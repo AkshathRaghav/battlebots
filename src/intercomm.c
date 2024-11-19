@@ -1,14 +1,15 @@
 #include "intercomm.h"
 #include "game.h"
 
-void send_data(uint8_t msg) {
+void COMM_SendData(uint8_t msg) {
   // Waiting until the USART TX data registor is !empty 
-  clear_uart_errors(); 
+  _clear_uart_errors(); 
+
   while (!(USART1->ISR & USART_ISR_TXE));
   USART1->TDR = msg;
 }
 
-uint8_t read_data() {
+uint8_t COMM_ReadData() {
   if (init_flag) { 
     if (!(USART1->ISR & USART_ISR_RXNE)) done_first = 0; 
   }
@@ -19,7 +20,7 @@ uint8_t read_data() {
   return x;
 }
 
-void clear_uart_errors() {
+void _clear_uart_errors() {
   if (USART1->ISR & USART_ISR_ORE) {
     volatile uint8_t dummy = USART1->RDR; 
     (void)dummy;
