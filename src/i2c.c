@@ -477,86 +477,44 @@ int main() {
     enable_ports();
     init_i2c();
 
-    // If you don't want to deal with the command shell, you can 
-    // comment out all code below and call 
-    // eeprom_read/eeprom_write directly.
-    init_usart5();
-    enable_tty_interrupt();
-    // These turn off buffering.
-    setbuf(stdin,0); 
-    setbuf(stdout,0);
-    setbuf(stderr,0);
+    // // If you don't want to deal with the command shell, you can 
+    // // comment out all code below and call 
+    // // eeprom_read/eeprom_write directly.
+    // init_usart5();
+    // enable_tty_interrupt();
+    // // These turn off buffering.
+    // setbuf(stdin,0); 
+    // setbuf(stdout,0);
+    // setbuf(stderr,0);
 
-    printf("I2C Command Shell\n");
-    printf("This is a simple shell that allows you to write to or read from the I2C EEPROM at %d.\n", EEPROM_ADDR);
-    for(;;) {
-        printf("\n> ");
-        char line[100];
-        fgets(line, 99, stdin);
-        line[99] = '\0';
-        int len = strlen(line);
-        if (line[len-1] == '\n')
-            line[len-1] = '\0';
-        parse_command(line);
-    }
-
-
-    // void eeprom_write(uint16_t loc, const char* data, uint8_t len) {
-    // uint16_t location = 0x20;
-    // char* data = "Player 1 Won!";
-    // uint8_t len = sizeof(data);
-    // eeprom_write(location, data, len);
-    // nano_wait(100000000);
-    // char * data_buf;
-    // eeprom_read(location, data_buf, len);
-
-    // for(int i = 0; i< len; i++)
-    // {
-    //     printf(data[i]);
+    // printf("I2C Command Shell\n");
+    // printf("This is a simple shell that allows you to write to or read from the I2C EEPROM at %d.\n", EEPROM_ADDR);
+    // for(;;) {
+    //     printf("\n> ");
+    //     char line[100];
+    //     fgets(line, 99, stdin);
+    //     line[99] = '\0';
+    //     int len = strlen(line);
+    //     if (line[len-1] == '\n')
+    //         line[len-1] = '\0';
+    //     parse_command(line);
     // }
-    // nano_wait(100000000);
-
 
 }
 
-int Update(int ship_num)
+int Num_Games_Updater()
 {
-    if(ship_num == 1)
-    {
-        uint16_t loc = 0x0;
-    }
-    else if(ship_num == 2)
-    {
-        uint16_t loc = 0x32;
-    }
-    uint8_t score;  
+    uint16_t loc = 0x0;
+    uint8_t games_played;  
     char data;      
-    // Read the score from the EEPROM at the specified location
+    // Read the games_played from the EEPROM at the specified location
     eeprom_read(loc, &data, 1);  // Length is 1 byte
     nano_wait(100000000);
     // Convert the `char` data back to `uint8_t`
-    score = (uint8_t)data;
-    score++;
-    data = (char)score;
+    games_played = (uint8_t)data;
+    games_played++;
+    data = (char)games_played;
     eeprom_write(loc, &data, 1);
     nano_wait(100000000);
-    return score;
-}
-
-int Read(int ship_num)
-{
-    if(ship_num == 1)
-    {
-        uint16_t loc = 0x0;
-    }
-    else if(ship_num == 2)
-    {
-        uint16_t loc = 0x32;
-    }
-    uint8_t score;  
-    char data;  
-    eeprom_read(loc, &data, 1);
-    nano_wait(100000000);
-    score = (uint8_t)data;
-    return score;
+    return games_played;
 }
