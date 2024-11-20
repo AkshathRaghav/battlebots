@@ -5,6 +5,16 @@
 #include <string.h>
 #include <stdio.h>
 
+void led_on(int on)
+{
+    GPIOB->BSRR |= (on ? GPIO_BSRR_BS_12 : GPIO_BSRR_BR_12);
+}
+
+void led_wait(int on)
+{
+    GPIOB->BSRR |= (on ? GPIO_BSRR_BS_13 : GPIO_BSRR_BR_13);
+}
+
 void debug_draw(){
   for(int i = 0; i < SIZE; i ++ )
     for(int j = 0; j < SIZE; j ++)
@@ -287,9 +297,78 @@ void LCD_WaitScreen() {
     LCD_DrawFillRectangle(55, y_start + letter_height + 20, x_start + letter_width + 3, y_start + letter_height + 20 + 5, color);
 }
 
-void LCD_EndScreen() { 
+void draw_digit(int x_start, int y_start, int digit, int segment_length, int segment_thickness, Color color) {
+    // Error handling for invalid digits
+    if (digit < 0 || digit > 9) return;
+
+    // Define 7-segment patterns for digits 0-9
+    const uint8_t segment_map[10] = {
+        0b0111111, // "0" - a, b, c, d, e, f
+        0b0000110, // "1" - b, c
+        0b1011011, // "2" - a, b, d, e, g
+        0b1001111, // "3" - a, b, c, d, g
+        0b1100110, // "4" - b, c, f, g
+        0b1101101, // "5" - a, c, d, f, g
+        0b1111101, // "6" - a, c, d, e, f, g
+        0b0000111, // "7" - a, b, c
+        0b1111111, // "8" - a, b, c, d, e, f, g
+        0b1101111  // "9" - a, b, c, d, f, g
+    };
+
+    // Extract the segments for the given digit
+    uint8_t segments = segment_map[digit];
+
+    // Define segment positions and sizes relative to the starting position
+    int a_x1 = x_start + segment_thickness;             // Top horizontal segment (a)
+    int a_y1 = y_start;
+    int a_x2 = x_start + segment_length + segment_thickness;
+    int a_y2 = y_start + segment_thickness;
+
+    int b_x1 = x_start + segment_length;                // Top-right vertical segment (b)
+    int b_y1 = y_start + segment_thickness;
+    int b_x2 = b_x1 + segment_thickness;
+    int b_y2 = b_y1 + segment_length;
+
+    int c_x1 = x_start + segment_length;                // Bottom-right vertical segment (c)
+    int c_y1 = b_y2;
+    int c_x2 = c_x1 + segment_thickness;
+    int c_y2 = c_y1 + segment_length;
+
+    int d_x1 = a_x1;                                    // Bottom horizontal segment (d)
+    int d_y1 = c_y2;
+    int d_x2 = a_x2;
+    int d_y2 = d_y1 + segment_thickness;
+
+    int e_x1 = x_start;                                 // Bottom-left vertical segment (e)
+    int e_y1 = c_y1;
+    int e_x2 = e_x1 + segment_thickness;
+    int e_y2 = e_y1 + segment_length;
+
+    int f_x1 = x_start;                                 // Top-left vertical segment (f)
+    int f_y1 = b_y1;
+    int f_x2 = f_x1 + segment_thickness;
+    int f_y2 = f_y1 + segment_length;
+
+    int g_x1 = a_x1;                                    // Middle horizontal segment (g)
+    int g_y1 = f_y2;
+    int g_x2 = a_x2;
+    int g_y2 = g_y1 + segment_thickness;
+
+    // Draw each segment if it's active
+    if (segments & 0b0000001) LCD_DrawFillRectangle(a_x1, a_y1, a_x2, a_y2, color); // a
+    if (segments & 0b0000010) LCD_DrawFillRectangle(b_x1, b_y1, b_x2, b_y2, color); // b
+    if (segments & 0b0000100) LCD_DrawFillRectangle(c_x1, c_y1, c_x2, c_y2, color); // c
+    if (segments & 0b0001000) LCD_DrawFillRectangle(d_x1, d_y1, d_x2, d_y2, color); // d
+    if (segments & 0b0010000) LCD_DrawFillRectangle(e_x1, e_y1, e_x2, e_y2, color); // e
+    if (segments & 0b0100000) LCD_DrawFillRectangle(f_x1, f_y1, f_x2, f_y2, color); // f
+    if (segments & 0b1000000) LCD_DrawFillRectangle(g_x1, g_y1, g_x2, g_y2, color); // g
+}
+
+
+
+void LCD_StartScreen() { 
     int x_start = 60; 
-    int y_start = 140; 
+    int y_start = 60; 
     int letter_width = 20; 
     int letter_height = 30; 
     int space = 10;
@@ -303,10 +382,21 @@ void LCD_EndScreen() {
     x_start += letter_width + space; 
     draw_exclamation_point(x_start, y_start, letter_height, letter_width, color); 
     LCD_DrawFillRectangle(55, y_start + letter_height + 20, x_start + letter_width + 3, y_start + letter_height + 20 + 5, color);
+    
+    x_start = 120; 
+    y_start += letter_height + 40; 
+    draw_digit(x_start, y_start, 8, letter_height, letter_width, color);
+    x_start += 40;
+    draw_digit(x_start, y_start, 2, letter_height, letter_width, color); 
 
+    x_start = 120; 
+    y_start += letter_height + 10; 
+    draw_digit(x_start, y_start, 0, letter_height, letter_width, color); 
+    x_start += 40;
+    draw_digit(x_start, y_start, 1, letter_height, letter_width, color); 
 }
 
-void LCD_StartScreen() {
+void LCD_EndScreen() {
     int x_start = 50;   
     int y_start = 60;   
     int letter_width = 20;

@@ -76,10 +76,12 @@ void SysTick_Handler() {
         init_flag = 0; 
       }
 
-      if (turn_flag) { 
+      if (turn_flag) {
+        led_on(1);
+        led_wait(0);
         LCD_DrawCursor(valid_flag ? COLOR_GREEN : COLOR_RED);
-        if (ship_hit_counter >= 17){
-          COMM_SendData(69); // Transmitting LOST. 
+        if (ship_hit_counter >= 3){
+          COMM_SendData(69);  
           state = END_SCREEN; 
           ship_hit_counter = 0; 
         }
@@ -97,6 +99,8 @@ void SysTick_Handler() {
           }
         }
       } else { 
+        led_on(0); 
+        led_wait(1);
         LCD_DrawCursor(COLOR_WHITE);
         Game_ReadBomb();
         turn_flag = 1; 
@@ -106,7 +110,8 @@ void SysTick_Handler() {
     else if (state == END_SCREEN){
       if (!init_flag){
         LCD_Clear(COLOR_WHITE);
-        LCD_EndScreen();  
+        LCD_EndScreen();
+        // ATHARVA: Update it here.   
         init_flag = 1; 
       } 
 

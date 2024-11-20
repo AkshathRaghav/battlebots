@@ -29,6 +29,8 @@ struct commands_t {
 
 extern int grid[SIZE][SIZE];
 
+void led_on(int);
+void led_wait(int);
 void debug_draw(); 
 void command_shell(void);
 void LCD_Setup();

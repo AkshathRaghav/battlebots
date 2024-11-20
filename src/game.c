@@ -56,15 +56,16 @@ void Game_Reset() {
 void Game_ReadBomb(){
     uint8_t recived_data = COMM_ReadData(); 
     
-    // if (recived_data == (uint8_t)(69)) { 
-    //     state = END
-    // }
-
-    int boomb_x = recived_data & 0xF; 
-    int boomb_y = (recived_data & 0xF0) >> 4; // Dumbass
-
-    // If there is a ship, send 255, else 0 
-    COMM_SendData(grid[boomb_x][boomb_y] == 1 ? (uint8_t)(255) : (uint8_t)0);
+    if (recived_data == (uint8_t)(69)) { 
+        state = END_SCREEN;
+        ship_hit_counter = 0; 
+    } else { 
+        int boomb_x = recived_data & 0xF; 
+        int boomb_y = (recived_data & 0xF0) >> 4; 
+        
+        // If there is a ship, send 255, else 0 
+        COMM_SendData(grid[boomb_x][boomb_y] == 1 ? (uint8_t)(255) : (uint8_t)(0));
+    } 
 }
 
 void Game_Confirm_Cursor() { 
@@ -294,7 +295,6 @@ void check_bounds(int x1, int x2, int y1, int y2) {
 void check_mv_rot() {
     int x1_temp = coord_array[counter][0];
     int y1_temp = coord_array[counter][1];
-
 
     int x2_temp = coord_array[counter][2];
     int y2_temp = coord_array[counter][3];
