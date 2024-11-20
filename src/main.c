@@ -84,6 +84,7 @@ void initb() {
 
 }
 
+
 /**
  * @brief Change the ODR value from 0 to 1 or 1 to 0 for a specified 
  *        pin of a port.

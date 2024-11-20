@@ -217,6 +217,7 @@ int i2c_checknack(void) {
 //wait for nanowait(10000000) * 2
 //READ EEPROM
 //DISPLAY
+
 void eeprom_write(uint16_t loc, const char* data, uint8_t len) {
     uint8_t bytes[34];
     bytes[0] = loc>>8;
@@ -501,17 +502,61 @@ int main() {
 
 
     // void eeprom_write(uint16_t loc, const char* data, uint8_t len) {
-    uint16_t location = 0x20;
-    char* data = "Player 1 Won!";
-    uint8_t len = sizeof(data);
-    eeprom_write(location, data, len);
-    nano_wait(100000000);
-    char * data_buf;
-    eeprom_read(location, data_buf, len);
+    // uint16_t location = 0x20;
+    // char* data = "Player 1 Won!";
+    // uint8_t len = sizeof(data);
+    // eeprom_write(location, data, len);
+    // nano_wait(100000000);
+    // char * data_buf;
+    // eeprom_read(location, data_buf, len);
 
-    for(int i = 0; i< len; i++)
+    // for(int i = 0; i< len; i++)
+    // {
+    //     printf(data[i]);
+    // }
+    // nano_wait(100000000);
+
+
+}
+
+int Update(int ship_num)
+{
+    if(ship_num == 1)
     {
-        printf(data[i]);
+        uint16_t loc = 0x0;
     }
+    else if(ship_num == 2)
+    {
+        uint16_t loc = 0x32;
+    }
+    uint8_t score;  
+    char data;      
+    // Read the score from the EEPROM at the specified location
+    eeprom_read(loc, &data, 1);  // Length is 1 byte
     nano_wait(100000000);
+    // Convert the `char` data back to `uint8_t`
+    score = (uint8_t)data;
+    score++;
+    data = (char)score;
+    eeprom_write(loc, &data, 1);
+    nano_wait(100000000);
+    return score;
+}
+
+int Read(int ship_num)
+{
+    if(ship_num == 1)
+    {
+        uint16_t loc = 0x0;
+    }
+    else if(ship_num == 2)
+    {
+        uint16_t loc = 0x32;
+    }
+    uint8_t score;  
+    char data;  
+    eeprom_read(loc, &data, 1);
+    nano_wait(100000000);
+    score = (uint8_t)data;
+    return score;
 }
