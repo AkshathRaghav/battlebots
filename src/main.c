@@ -1,5 +1,7 @@
 #include "main.h"
 
+#include "i2c.c"
+
 const char* team = "battlebots";
 volatile int current_col = 1; 
 int done_first = 1;
@@ -111,7 +113,9 @@ void SysTick_Handler() {
       if (!init_flag){
         LCD_Clear(COLOR_WHITE);
         LCD_EndScreen();
-        // ATHARVA: Update it here.   
+        // ATHARVA: Update it here.  
+
+        int num_games = Num_Games_Updater();
         init_flag = 1; 
       } 
 
