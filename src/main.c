@@ -1,16 +1,15 @@
 #include "main.h"
 
-#include "i2c.c"
-
 const char* team = "battlebots";
 volatile int current_col = 1; 
 int done_first = 1;
+int cum_games_played = 0; 
 
 // Interrupt handler 
 // Main router interface on every interrupt-call
 void SysTick_Handler() {
-    if (state == LOADING_SCREEN) { 
-        if ((current_col == 1) & (GPIOC_IDR & 0x1)) { // * 
+    if (state == LOADING_SCREEN) {
+      if ((current_col == 1) & (GPIOC_IDR & 0x1)) { // * 
         LCD_Clear(COLOR_WHITE);
         LCD_DrawCoords(); 
         state = SET_SHIPS; 
@@ -59,7 +58,6 @@ void SysTick_Handler() {
 
     else if (state == WAIT_SCREEN) { 
       init_flag = 1; 
-
       COMM_SendData(255);
       if (COMM_ReadData() == (uint8_t)255) { 
         turn_flag = done_first; 
@@ -82,12 +80,13 @@ void SysTick_Handler() {
         led_on(1);
         led_wait(0);
         LCD_DrawCursor(valid_flag ? COLOR_GREEN : COLOR_RED);
-        if (ship_hit_counter >= 3){
+        if (ship_hit_counter > 3){
           COMM_SendData(69);  
           state = END_SCREEN; 
-          ship_hit_counter = 0; 
+          ship_hit_counter = 0;
+          cum_games_played = Num_Games_Updater();
         }
-        else{
+        else {
           if (current_col == 3) {
             if (GPIOC_IDR & 0x1) Game_Confirm_Cursor(); // #
             else if (GPIOC_IDR & 0x4) Game_MvRight_Cursor(); // 6
@@ -113,17 +112,14 @@ void SysTick_Handler() {
       if (!init_flag){
         LCD_Clear(COLOR_WHITE);
         LCD_EndScreen();
-        // ATHARVA: Update it here.  
-
-        int num_games = Num_Games_Updater();
         init_flag = 1; 
       } 
 
       if ((current_col == 1) && (GPIOC_IDR & 0x1)) {
+        Game_Reset(); 
         state = LOADING_SCREEN; 
         LCD_Clear(COLOR_WHITE); 
         LCD_StartScreen(); 
-        Game_Reset(); 
       }
     }
 
@@ -144,8 +140,14 @@ int main() {
     // Terminal
     init_usart1(); 
 
+    // I2C
+    enable_ports();
+    init_i2c();
+    eeprom_write(LOC, (char) '0', 1);
+
     // Setup TFT
     LCD_Setup();
+    LCD_Clear(COLOR_WHITE);
     LCD_StartScreen(); 
 }
    

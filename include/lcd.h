@@ -2,9 +2,11 @@
 // lcd.h: Adapted from the lcdwiki.com examples.
 //============================================================================
 
+
 #ifndef __LCD_H
 #define __LCD_H
 #include "stdlib.h"
+#include "i2c.h"
 
 // shorthand notation for 8-bit and 16-bit unsigned integers
 typedef uint8_t u8;

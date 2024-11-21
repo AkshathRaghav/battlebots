@@ -34,3 +34,6 @@ void init_sdcard_io();
 void sdcard_io_high_speed();
 void init_lcd_spi();
 
+// I2C
+void enable_ports();
+void init_i2c();

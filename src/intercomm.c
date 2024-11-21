@@ -5,6 +5,13 @@ void COMM_SendData(uint8_t msg) {
   // Waiting until the USART TX data registor is !empty 
   _clear_uart_errors(); 
 
+  // Nikhil Buzzer (New Code)
+  
+  // if(msg == (uint8_t)(255)){
+  //   buzz();
+  // } 
+  // End of Nikhil Buzzer (New Code)
+
   while (!(USART1->ISR & USART_ISR_TXE));
   USART1->TDR = msg;
 }

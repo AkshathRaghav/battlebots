@@ -8,8 +8,6 @@
 #include <stdint.h>
 #include "lcd.h"
 
-void nano_wait(int t);
-
 lcd_dev_t lcddev;
 
 #define SPI SPI1

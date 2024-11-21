@@ -25,18 +25,21 @@ int turn_flag = 0; // Gets initially set in main.c#SystickHandler
 
 
 void Game_Reset() {
+    done_first = 1; 
+    _clear_uart_errors();
     init_flag = 0; 
     counter = 0;
     state = LOADING_SCREEN; 
     orientation = 3;
+    cursor_x = 0; 
     valid_flag = 1;
     cursor_y = 0; 
     ship_hit_counter = 0;
-    cursor_x = 0; 
     
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             grid[i][j] = 0;
+            hits[i][j] = 0;
         }
     }
     int default_coord_array[5][4] = {
@@ -64,9 +67,81 @@ void Game_ReadBomb(){
         int boomb_y = (recived_data & 0xF0) >> 4; 
         
         // If there is a ship, send 255, else 0 
-        COMM_SendData(grid[boomb_x][boomb_y] == 1 ? (uint8_t)(255) : (uint8_t)(0));
+
+        // COMM_SendData(grid[boomb_x][boomb_y] == 1 ? (uint8_t)(255) : (uint8_t)(0));
+        if(grid[boomb_x][boomb_y] == 1){
+            // play buzzer 
+            buzz();
+            COMM_SendData((uint8_t)(255));
+        }
+        else{
+            COMM_SendData((uint8_t)(0));
+        }
     } 
 }
+
+// Nikhil Buzzer (New Code)
+// int buzz_count = 0;
+int buzz_count;
+
+void setup_tim3(void) {
+    RCC -> AHBENR |= RCC_AHBENR_GPIOCEN;
+    RCC -> APB1ENR |= RCC_APB1ENR_TIM3EN;
+
+    GPIOC -> MODER &= ~0xC0000; // clearing the bits for PC9
+    GPIOC -> MODER |= 0x80000; // setup alternate function mode for GPIOC pins 9
+    GPIOC -> AFR[1] &= ~(GPIO_AFRH_AFRH1);
+    
+    TIM3 -> PSC = 47999;
+    TIM3 -> ARR = 999;
+    TIM3 -> CCMR2 |= TIM_CCMR2_OC4M_2 | TIM_CCMR2_OC4M_1;
+    TIM3 -> CCMR2 &= ~ TIM_CCMR2_OC4M_0;
+    TIM3 -> CCER |= TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E | TIM_CCER_CC4E; // Configure TIM3 for PWM mode 1 so that each channel output can have a CCR value from 0 to 1000. 
+    TIM3 -> CR1 = TIM_CR1_CEN; // start clock
+    TIM3 -> CCR4 = 1000; // 200  
+}   
+
+void enable_buzz_ports(void) {
+    RCC -> AHBENR |= RCC_AHBENR_GPIOCEN; // enable RCC clock for GPIOC OK
+    GPIOC -> MODER &=~ GPIO_MODER_MODER9;
+    GPIOC -> MODER |= GPIO_MODER_MODER9_0;
+}
+
+void init_tim15(void) {
+    RCC->APB2ENR |= RCC_APB2ENR_TIM15EN;
+    TIM15 -> DIER |= TIM_DIER_UDE;
+    TIM15 -> DIER &= ~TIM_DIER_UIE;
+    TIM15 -> CR1 = TIM_CR1_CEN;
+    TIM15 -> ARR = 23;
+    TIM15 -> PSC = 1999;
+}
+
+void delay_ms(uint32_t ms){
+    //config tim 15 for delay
+    RCC -> APB2ENR |= RCC_APB2ENR_TIM15EN;
+    TIM15 -> PSC = 47;
+    TIM15 -> ARR = ms - 1;
+    TIM15 -> DIER |= TIM_DIER_UIE;
+    TIM15 -> CR1 |= TIM_CR1_CEN;
+    NVIC->ISER[0] |= 1 << TIM15_IRQn;
+}
+
+void TIM15_IRQHandler(){
+    TIM15->SR &= ~TIM_SR_UIF;
+    buzz_count++;
+    if(buzz_count > 10){
+        TIM3->CCR4 = 0;
+        buzz_count = 0;
+    }
+}
+
+void buzz(){
+    // internal_clock();
+    enable_buzz_ports();
+    setup_tim3();
+    delay_ms(1000000000000000000);
+}
+// END OF Nikhil Buzzer (New Code)
 
 void Game_Confirm_Cursor() { 
     // Only confirm move if not played before 

@@ -27,6 +27,7 @@ extern int coord_array[5][4];
 extern int turn_flag;
 extern int boomb_x; 
 extern int boomb_y; 
+extern int cum_games_played; 
 
 extern int ship_hit_counter;
 
@@ -59,3 +60,11 @@ void Game_MvRight_Cursor();
 void Game_MvDown_Cursor();
 void Game_MvUp_Cursor();
 void Game_MvLeft_Cursor();
+
+// buzzer
+void setup_tim3(void);
+void enable_buzz_ports(void);
+void init_tim15(void);
+void delay_ms(uint32_t ms);
+void TIM15_IRQHandler();
+void buzz();;

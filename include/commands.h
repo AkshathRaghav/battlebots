@@ -2,6 +2,7 @@
 #define __COMMANDS_H__
 
 #include "lcd.h"
+#include "i2c.h"
 #define SIZE 8 
 
 typedef enum {
@@ -28,6 +29,7 @@ struct commands_t {
 };
 
 extern int grid[SIZE][SIZE];
+extern int cum_games_played; 
 
 void led_on(int);
 void led_wait(int);
@@ -35,6 +37,7 @@ void debug_draw();
 void command_shell(void);
 void LCD_Setup();
 void LCD_StartScreen(); 
+void LCD_EndScreen(); 
 void LCD_DrawGrid(); 
 void LCD_SetValidDots(int x1, int y1, int x2, int y2);
 void LCD_DrawCoords(); 

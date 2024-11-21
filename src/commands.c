@@ -297,78 +297,104 @@ void LCD_WaitScreen() {
     LCD_DrawFillRectangle(55, y_start + letter_height + 20, x_start + letter_width + 3, y_start + letter_height + 20 + 5, color);
 }
 
-void draw_digit(int x_start, int y_start, int digit, int segment_length, int segment_thickness, Color color) {
-    // Error handling for invalid digits
-    if (digit < 0 || digit > 9) return;
 
-    // Define 7-segment patterns for digits 0-9
-    const uint8_t segment_map[10] = {
-        0b0111111, // "0" - a, b, c, d, e, f
-        0b0000110, // "1" - b, c
-        0b1011011, // "2" - a, b, d, e, g
-        0b1001111, // "3" - a, b, c, d, g
-        0b1100110, // "4" - b, c, f, g
-        0b1101101, // "5" - a, c, d, f, g
-        0b1111101, // "6" - a, c, d, e, f, g
-        0b0000111, // "7" - a, b, c
-        0b1111111, // "8" - a, b, c, d, e, f, g
-        0b1101111  // "9" - a, b, c, d, f, g
-    };
+void draw_8(int x_start, int y_start, int letter_width, int letter_height, Color color) {
+    int vertical_length = letter_width / 2; 
+    int horizontal_height = letter_height * 3; 
+    int spacing = vertical_length;       
 
-    // Extract the segments for the given digit
-    uint8_t segments = segment_map[digit];
+    LCD_DrawFillRectangle(x_start, y_start, x_start + letter_width, y_start + horizontal_height, color); // Top horizontal
+    LCD_DrawFillRectangle(x_start, y_start + spacing + 1, x_start + letter_width, y_start + spacing + horizontal_height, color); // Middle horizontal
+    LCD_DrawFillRectangle(x_start, y_start + spacing + spacing, x_start + letter_width, y_start + 2 * spacing + horizontal_height, color); // Bottom horizontal
 
-    // Define segment positions and sizes relative to the starting position
-    int a_x1 = x_start + segment_thickness;             // Top horizontal segment (a)
-    int a_y1 = y_start;
-    int a_x2 = x_start + segment_length + segment_thickness;
-    int a_y2 = y_start + segment_thickness;
+    LCD_DrawFillRectangle(x_start, y_start + horizontal_height, x_start + horizontal_height / 2, y_start + spacing, color); // Left vertical (top)
+    LCD_DrawFillRectangle(x_start + letter_width - horizontal_height / 2, y_start + horizontal_height, x_start + letter_width, y_start + spacing, color); // Right vertical (top)
 
-    int b_x1 = x_start + segment_length;                // Top-right vertical segment (b)
-    int b_y1 = y_start + segment_thickness;
-    int b_x2 = b_x1 + segment_thickness;
-    int b_y2 = b_y1 + segment_length;
+    LCD_DrawFillRectangle(x_start, y_start + spacing + horizontal_height, x_start + horizontal_height / 2, y_start + 2 * spacing, color); // Left vertical (bottom)
+    LCD_DrawFillRectangle(x_start + letter_width - horizontal_height / 2, y_start + spacing + horizontal_height, x_start + letter_width, y_start + 2 * spacing, color); // Right vertical (bottom)
+}
 
-    int c_x1 = x_start + segment_length;                // Bottom-right vertical segment (c)
-    int c_y1 = b_y2;
-    int c_x2 = c_x1 + segment_thickness;
-    int c_y2 = c_y1 + segment_length;
+void draw_digit(int num, int x_start, int y_start, int color) {
+    switch (num) {
+        case 0: // Draw '0'
+            // Outer rectangle
+            LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + 30, color); // Left vertical bar
+            LCD_DrawFillRectangle(x_start + 15, y_start, x_start + 20, y_start + 30, color); // Right vertical bar
+            LCD_DrawFillRectangle(x_start + 5, y_start, x_start + 15, y_start + 5, color); // Top horizontal bar
+            LCD_DrawFillRectangle(x_start + 5, y_start + 25, x_start + 15, y_start + 30, color); // Bottom horizontal bar
+            break;
 
-    int d_x1 = a_x1;                                    // Bottom horizontal segment (d)
-    int d_y1 = c_y2;
-    int d_x2 = a_x2;
-    int d_y2 = d_y1 + segment_thickness;
+        case 1: // Draw '1'
+            LCD_DrawFillRectangle(x_start + 7, y_start, x_start + 13, y_start + 30, color); // Center vertical bar
+            break;
 
-    int e_x1 = x_start;                                 // Bottom-left vertical segment (e)
-    int e_y1 = c_y1;
-    int e_x2 = e_x1 + segment_thickness;
-    int e_y2 = e_y1 + segment_length;
+        case 2: // Draw '2'
+            LCD_DrawFillRectangle(x_start, y_start, x_start + 20, y_start + 5, color); // Top horizontal bar
+            LCD_DrawFillRectangle(x_start + 15, y_start, x_start + 20, y_start + 15, color); // Top-right vertical bar
+            LCD_DrawFillRectangle(x_start, y_start + 15, x_start + 20, y_start + 20, color); // Middle horizontal bar
+            LCD_DrawFillRectangle(x_start, y_start + 15, x_start + 5, y_start + 30, color); // Bottom-left vertical bar
+            LCD_DrawFillRectangle(x_start, y_start + 25, x_start + 20, y_start + 30, color); // Bottom horizontal bar
+            break;
 
-    int f_x1 = x_start;                                 // Top-left vertical segment (f)
-    int f_y1 = b_y1;
-    int f_x2 = f_x1 + segment_thickness;
-    int f_y2 = f_y1 + segment_length;
+        case 3: // Draw '3'
+            LCD_DrawFillRectangle(x_start, y_start, x_start + 20, y_start + 5, color); // Top horizontal bar
+            LCD_DrawFillRectangle(x_start + 15, y_start, x_start + 20, y_start + 30, color); // Right vertical bar
+            LCD_DrawFillRectangle(x_start, y_start + 12, x_start + 20, y_start + 17, color); // Middle horizontal bar
+            LCD_DrawFillRectangle(x_start, y_start + 25, x_start + 20, y_start + 30, color); // Bottom horizontal bar
+            break;
 
-    int g_x1 = a_x1;                                    // Middle horizontal segment (g)
-    int g_y1 = f_y2;
-    int g_x2 = a_x2;
-    int g_y2 = g_y1 + segment_thickness;
+        case 4: // Draw '4'
+            LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + 15, color); // Left vertical bar
+            LCD_DrawFillRectangle(x_start + 15, y_start, x_start + 20, y_start + 30, color); // Right vertical bar
+            LCD_DrawFillRectangle(x_start, y_start + 15, x_start + 20, y_start + 20, color); // Middle horizontal bar
+            break;
 
-    // Draw each segment if it's active
-    if (segments & 0b0000001) LCD_DrawFillRectangle(a_x1, a_y1, a_x2, a_y2, color); // a
-    if (segments & 0b0000010) LCD_DrawFillRectangle(b_x1, b_y1, b_x2, b_y2, color); // b
-    if (segments & 0b0000100) LCD_DrawFillRectangle(c_x1, c_y1, c_x2, c_y2, color); // c
-    if (segments & 0b0001000) LCD_DrawFillRectangle(d_x1, d_y1, d_x2, d_y2, color); // d
-    if (segments & 0b0010000) LCD_DrawFillRectangle(e_x1, e_y1, e_x2, e_y2, color); // e
-    if (segments & 0b0100000) LCD_DrawFillRectangle(f_x1, f_y1, f_x2, f_y2, color); // f
-    if (segments & 0b1000000) LCD_DrawFillRectangle(g_x1, g_y1, g_x2, g_y2, color); // g
+        case 5: // Draw '5'
+            LCD_DrawFillRectangle(x_start, y_start, x_start + 20, y_start + 5, color); // Top horizontal bar
+            LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + 15, color); // Top-left vertical bar
+            LCD_DrawFillRectangle(x_start, y_start + 15, x_start + 20, y_start + 20, color); // Middle horizontal bar
+            LCD_DrawFillRectangle(x_start + 15, y_start + 15, x_start + 20, y_start + 30, color); // Bottom-right vertical bar
+            LCD_DrawFillRectangle(x_start, y_start + 25, x_start + 20, y_start + 30, color); // Bottom horizontal bar
+            break;
+
+        case 6: // Draw '6'
+            LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + 30, color); // Left vertical bar
+            LCD_DrawFillRectangle(x_start + 15, y_start + 15, x_start + 20, y_start + 30, color); // Bottom-right vertical bar
+            LCD_DrawFillRectangle(x_start + 5, y_start, x_start + 15, y_start + 5, color); // Top horizontal bar
+            LCD_DrawFillRectangle(x_start + 5, y_start + 15, x_start + 15, y_start + 20, color); // Middle horizontal bar
+            LCD_DrawFillRectangle(x_start + 5, y_start + 25, x_start + 15, y_start + 30, color); // Bottom horizontal bar
+            break;
+
+        case 7: // Draw '7'
+            LCD_DrawFillRectangle(x_start, y_start, x_start + 20, y_start + 5, color); // Top horizontal bar
+            LCD_DrawFillRectangle(x_start + 15, y_start, x_start + 20, y_start + 30, color); // Right vertical bar
+            break;
+
+        case 8: // Draw '8'
+            LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + 30, color); // Left vertical bar
+            LCD_DrawFillRectangle(x_start + 15, y_start, x_start + 20, y_start + 30, color); // Right vertical bar
+            LCD_DrawFillRectangle(x_start + 5, y_start, x_start + 15, y_start + 5, color); // Top horizontal bar
+            LCD_DrawFillRectangle(x_start + 5, y_start + 15, x_start + 15, y_start + 20, color); // Middle horizontal bar
+            LCD_DrawFillRectangle(x_start + 5, y_start + 25, x_start + 15, y_start + 30, color); // Bottom horizontal bar
+            break;
+
+        case 9: // Draw '9'
+            LCD_DrawFillRectangle(x_start + 15, y_start, x_start + 20, y_start + 30, color); // Right vertical bar
+            LCD_DrawFillRectangle(x_start, y_start, x_start + 5, y_start + 15, color); // Top-left vertical bar
+            LCD_DrawFillRectangle(x_start + 5, y_start, x_start + 15, y_start + 5, color); // Top horizontal bar
+            LCD_DrawFillRectangle(x_start + 5, y_start + 15, x_start + 15, y_start + 20, color); // Middle horizontal bar
+            break;
+
+        default:
+            // Handle invalid numbers
+            break;
+    }
 }
 
 
-
-void LCD_StartScreen() { 
-    int x_start = 60; 
-    int y_start = 60; 
+void LCD_EndScreen() { 
+    int x_start = 70; 
+    int y_start = 90; 
     int letter_width = 20; 
     int letter_height = 30; 
     int space = 10;
@@ -383,20 +409,25 @@ void LCD_StartScreen() {
     draw_exclamation_point(x_start, y_start, letter_height, letter_width, color); 
     LCD_DrawFillRectangle(55, y_start + letter_height + 20, x_start + letter_width + 3, y_start + letter_height + 20 + 5, color);
     
-    x_start = 120; 
-    y_start += letter_height + 40; 
-    draw_digit(x_start, y_start, 8, letter_height, letter_width, color);
-    x_start += 40;
-    draw_digit(x_start, y_start, 2, letter_height, letter_width, color); 
+    x_start = 30; 
+    y_start += letter_height + letter_height + 40; 
+    draw_T(x_start, y_start, letter_height, letter_width, color);
+    x_start += letter_width + space;
+    draw_O(x_start, y_start, letter_height, letter_width, color);
+    x_start += letter_width + space;
+    draw_T(x_start, y_start, letter_height, letter_width, color);
 
-    x_start = 120; 
-    y_start += letter_height + 10; 
-    draw_digit(x_start, y_start, 0, letter_height, letter_width, color); 
-    x_start += 40;
-    draw_digit(x_start, y_start, 1, letter_height, letter_width, color); 
+    x_start = 160; 
+    letter_width = 5; 
+    letter_height = 15; 
+    
+    draw_digit((cum_games_played - 1) / 10, x_start, y_start, COLOR_WHITE);
+    draw_digit((cum_games_played - 1) % 10, x_start + letter_width + 20, y_start, COLOR_WHITE); 
+    draw_digit(cum_games_played / 10, x_start, y_start, color);
+    draw_digit(cum_games_played % 10, x_start + letter_width + 20, y_start, color); 
 }
 
-void LCD_EndScreen() {
+void LCD_StartScreen() {
     int x_start = 50;   
     int y_start = 60;   
     int letter_width = 20;

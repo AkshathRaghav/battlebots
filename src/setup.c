@@ -131,3 +131,34 @@ void init_lcd_spi() {
     init_spi1_slow();
     sdcard_io_high_speed();  
 }
+
+// I2C
+void enable_ports() {
+    //enable clk for i2c1 scl and sda.
+    RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+
+    //configure PB6 and PB9 for AF.
+    GPIOB->MODER |= GPIO_MODER_MODER6_1 |GPIO_MODER_MODER9_1;
+    GPIOB->AFR[0] |= (1<<GPIO_AFRL_AFRL6_Pos); //PB6 is AF1
+    GPIOB->AFR[1] |= (1<<GPIO_AFRH_AFRH1_Pos); //PB9 is AF1
+}
+
+void init_i2c() {
+    RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;
+    I2C1->CR1 &=~ I2C_CR1_PE; //I2C disable
+    I2C1->CR1 |= I2C_CR1_ANFOFF; //analog filtering off
+    I2C1->CR1 |= I2C_CR1_ERRIE; //error interrupts enable
+    I2C1->CR1 |= I2C_CR1_NOSTRETCH; //DISABLES clock stretching
+
+    //clk stuff.    Need to check.
+    // I2C1->TIMINGR = 5 << I2C_TIMINGR_PRESC_Pos; //48 /(5 + 1) = 8 Mhz
+    // I2C1->TIMINGR |= (0x9) << I2C_TIMINGR_SCLL_Pos;
+    // I2C1->TIMINGR |= (0x3) << I2C_TIMINGR_SCLH_Pos;
+    // I2C1->TIMINGR |= (0x1) << I2C_TIMINGR_SDADEL_Pos;
+    // I2C1->TIMINGR |= (0x3) << I2C_TIMINGR_SCLDEL_Pos;
+    I2C1->TIMINGR = 0x00B01A4B;
+
+    //addressing
+    I2C1->CR2 &=~ I2C_CR2_ADD10; //7bit addressing mode
+    I2C1->CR1 |= I2C_CR1_PE; //I2C enable
+}
